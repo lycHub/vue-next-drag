@@ -1,0 +1,36 @@
+.editor-container {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  user-select: none;
+  .editor-box {
+    width: 414px;
+    padding: 12px;
+    background-color: #fff;
+    border: 1px dashed #dcdfe6;
+    border-spacing:10px 50px;
+    .canvas {
+      position: relative;
+      min-height: 736px;
+      background-color: inherit;
+      border: 1px solid #dcdfe6;
+      .widget {
+        position: absolute;
+        &.active {
+          outline: 1px solid aquamarine;
+        }
+      }
+    }
+    .drag-height {
+      text-align: center;
+      padding-top: 12px;
+      cursor: s-resize;
+    }
+  }
+}

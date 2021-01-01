@@ -1,0 +1,33 @@
+.basic-layout {
+  .header {
+    line-height: 60px;
+    background-color: #fff;
+    border-bottom: 1px solid #dcdfe6;
+  }
+  .aside {
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+    background-color: #fff;
+    .widget-list {
+      display: flex;
+      flex-wrap: wrap;
+      text-align: center;
+      padding: {
+        left: 5px;
+        top: 12px;
+        bottom: 12px;
+      };
+      .card {
+        width: 90px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        &:nth-child(odd) {
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+  .main {
+    position: relative;
+  }
+}

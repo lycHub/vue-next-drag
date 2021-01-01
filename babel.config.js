@@ -10,15 +10,6 @@ module.exports = {
         styleLibraryName: "theme-chalk"
       },
       'element-plus'
-    ],
-    [
-      'component',
-      {
-        libraryName: "lodash",
-        style: false,
-        camel2Dash: false
-      },
-      'lodash'
     ]
   ]
 }

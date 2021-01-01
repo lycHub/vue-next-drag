@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --report"
+    "build": "vue-cli-service build"
   },
   "dependencies": {
     "core-js": "^3.6.5",
@@ -16,6 +16,7 @@
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.166",
     "@vue/babel-plugin-jsx": "^1.0.0",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",

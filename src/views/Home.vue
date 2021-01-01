@@ -1,13 +1,23 @@
 <template>
   <div class="home">
-    home
+    <basic-layout>
+      <editor />
+    </basic-layout>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
+import BasicLayout from "../components/BasicLayout";
+import Editor from '../components/Editor';
 
 export default defineComponent({
-  name: 'Home'
+  name: 'Home',
+  components: { BasicLayout, Editor },
+  setup() {
+    onMounted(() => {
+
+    });
+  }
 });
 </script>
