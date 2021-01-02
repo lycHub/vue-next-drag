@@ -12,9 +12,17 @@ export default defineComponent({
     // const widgets = computed(() => store.state.editor.widgets);
     const widgets = store.state.editor.widgets;
     const renderWidgets = () => {
-      return widgets.length ? widgets.map((item, index) => {
-        return <Widget position={ item.position } index={ index }>
-          { h(item.component, { ...item.attrs, style: item.style }, { default: () => item.label }) }
+      return widgets.length ? widgets.map(item => {
+        const { width, height, ...rest } = item.style;
+        return <Widget info={ item } >
+          { h(item.component, {
+            ...item.attrs,
+            style: {
+              width: width + 'px',
+              height: height + 'px',
+              ...rest
+            }
+          }, { default: () => item.label }) }
         </Widget>;
       }) : null;
     }
@@ -50,7 +58,7 @@ export default defineComponent({
           <div class="editor-box">
             <div class="canvas" onDragover={ handleDragOver } onDrop={ handleDrop }>{ renderWidgets() }</div>
             <div class="drag-height">
-              <span>拖动调节高度--{ store.state.editor.test }</span>
+              <span>拖动调节高度</span>
             </div>
           </div>
         </div>

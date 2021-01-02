@@ -11,7 +11,11 @@ export const elBtn: Widget<typeof Button> = {
     left: 0,
     top: 0
   },
-  style: {},
+  style: {
+    borderRadius: 0,
+    width: 70,
+    height: 40
+  },
   attrs: {
     type: 'primary'
   }

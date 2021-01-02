@@ -23,7 +23,18 @@
       .widget {
         position: absolute;
         &.active {
-          outline: 1px solid aquamarine;
+          outline: 1px solid #f60;
+        }
+        .dot {
+          position: absolute;
+          border: 1px solid #f60;
+          width: 6px;
+          height: 6px;
+          margin: {
+            left: -3px;
+            top: -3px;
+          };
+          z-index: 1;
         }
       }
     }

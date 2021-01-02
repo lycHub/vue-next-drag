@@ -6,26 +6,28 @@ import {RootState} from "../types";
 
 export interface EditorState {
   widgets: Widget[];
-  test: string;
+  activeWidgetIds: string[];
 }
 
 const editor: Module<EditorState, RootState> = {
   namespaced: true,
   state: {
-    widgets: [],
-    test: 'aaa'
-  },
-  getters: {
-    widgets(state: EditorState) {
-      return state.widgets;
-    }
+    widgets: [], // 可能会引起不必要的开销
+    activeWidgetIds: []
   },
   mutations: {
-    setTest(state) {
-      state.test = 'vvvvv';
+    setActivateWidgetIds(state, ids: string[]) {
+      state.activeWidgetIds = ids;
     },
     addWidget(state, widget: Widget) {
       state.widgets.push(widget);
+    },
+    updateWidget(state, newWidget: { id: string; widget: Widget }) {
+      let index = state.widgets.findIndex(item => item.id === newWidget.id); // find不管用
+      if (index > -1) {
+        // state.widgets[index] = newWidget.widget;
+        state.widgets.splice(index, 1, newWidget.widget);
+      }
     },
     setWidgets(state, widgets: Widget[]) {
       state.widgets = widgets;
