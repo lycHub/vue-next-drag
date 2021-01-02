@@ -1,8 +1,9 @@
 import {defineComponent, onMounted, ref, PropType, computed, nextTick} from "vue";
-import {Widget} from "../../store/types";
+import {Widget, WidgetStyle} from "../../store/types";
 import {useStore} from "../../store";
 import Dot from './Dot';
-import {Direct, DotInfo, DragStartInfo} from "./types";
+import {Direct, DotInfo, DragStartInfo, WidgetMoveData} from "./types";
+import {emitter} from "./bus";
 
 export default defineComponent({
   name: 'Widget',
@@ -40,6 +41,10 @@ export default defineComponent({
       const { left, top } = calculate(diffX, diffY);
       root.value!.style.top = top + 'px';
       root.value!.style.left = left + 'px';
+      emitter.emit<WidgetMoveData>('move', {
+        dom: root.value!,
+        style: { ...props.info.widgetStyle, left, top }
+      });
     }
     const handleMouseUp = () => {
       toggleMoving(false);
@@ -56,10 +61,7 @@ export default defineComponent({
           }
         }
       });
-      // root.value!.style.transform = 'rotate(30deg)';
-      nextTick(() => {
-        console.log('up widgets', root.value!.getBoundingClientRect());
-      });
+      emitter.emit<void>('up');
     }
 
     const handleMousedown = (event: MouseEvent) => {
@@ -71,6 +73,7 @@ export default defineComponent({
         top: root.value!.offsetTop
       };
       root.value!.style.zIndex = '2';
+      emitter.emit<string>('press', props.info.id);
       setActive();
       toggleMoving(true);
     }

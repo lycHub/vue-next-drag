@@ -1,10 +1,11 @@
 import {defineComponent, h, computed, markRaw} from "vue";
 import Widget from "./Widget";
+import Lines from "./Lines/Lines";
 import './index.scss';
 import {useStore} from '../../store';
 import {WidgetList} from "../../store/widgets";
 import { uniqueId, cloneDeep } from 'lodash';
-let zIndex = 1;
+
 export default defineComponent({
   name: 'Editor',
   setup(props) {
@@ -46,7 +47,10 @@ export default defineComponent({
       return (
         <div class="editor-container">
           <div class="editor-box">
-            <div class="canvas" onDragover={ handleDragOver } onDrop={ handleDrop }>{ renderWidgets() }</div>
+            <div class="canvas" onDragover={ handleDragOver } onDrop={ handleDrop }>
+              { renderWidgets() }
+              <Lines widgets={ widgets } />
+            </div>
             <div class="drag-height">
               <span>拖动调节高度</span>
             </div>

@@ -10,6 +10,7 @@
     "core-js": "^3.6.5",
     "element-plus": "^1.0.1-alpha.19",
     "lodash": "^4.17.20",
+    "mitt": "^2.1.0",
     "normalize.css": "^8.0.1",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",

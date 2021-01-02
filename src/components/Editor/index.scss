@@ -20,6 +20,7 @@
       min-height: 736px;
       background-color: inherit;
       border: 1px solid #dcdfe6;
+      box-sizing: border-box;
       .widget {
         position: absolute;
         &.active {
@@ -35,6 +36,20 @@
             top: -3px;
           };
           z-index: 1;
+        }
+      }
+      .line {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        background-color: #59c7f9;
+        &.vertical {
+          width: 1px;
+          height: 100%;
+        }
+        &.show {
+          display: block;
         }
       }
     }
