@@ -15,14 +15,7 @@ export default defineComponent({
       return widgets.length ? widgets.map(item => {
         const { width, height, ...rest } = item.style;
         return <Widget info={ item } >
-          { h(item.component, {
-            ...item.attrs,
-            style: {
-              width: width + 'px',
-              height: height + 'px',
-              ...rest
-            }
-          }, { default: () => item.label }) }
+          { h(item.component, { ...item.attrs, style: item.style }, { default: () => item.label }) }
         </Widget>;
       }) : null;
     }
@@ -39,11 +32,8 @@ export default defineComponent({
         const index = event.dataTransfer?.getData('index'); // string | undefined
         if (index) {
           const widget = cloneDeep(WidgetList[+index]);
-          widget.position = {
-            left: event.offsetX,
-            top: event.offsetY
-          }
-          // console.log('position', event.target);
+          widget.widgetStyle.left = event.offsetX;
+          widget.widgetStyle.top = event.offsetY;
           widget.id = uniqueId('widget-');
           store.commit('editor/addWidget', widget);
           // console.log('target', widget);

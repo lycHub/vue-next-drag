@@ -7,14 +7,17 @@ export const elBtn: Widget<typeof Button> = {
   name: '按钮',
   label: '按钮',
   icon: 'el-icon-thumb',
-  position: {
+  widgetStyle: {
     left: 0,
-    top: 0
+    top: 0,
+    width: 70,
+    height: 40,
+    rotate: 0
   },
   style: {
     borderRadius: 0,
-    width: 70,
-    height: 40
+    width: '100%',
+    height: '100%'
   },
   attrs: {
     type: 'primary'

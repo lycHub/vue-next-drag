@@ -44,11 +44,13 @@ export default defineComponent({
     const handleMouseUp = () => {
       toggleMoving(false);
       root.value!.style.zIndex = '1';
+      const { widgetStyle, ...rest } = props.info;
       store.commit('editor/updateWidget', {
         id: props.info.id,
         widget: {
-          ...props.info,
-          position: {
+          ...rest,
+          widgetStyle: {
+            ...widgetStyle,
             left: root.value!.offsetLeft,
             top: root.value!.offsetTop
           }
@@ -129,8 +131,11 @@ export default defineComponent({
 
 
     onMounted(() => {
-      root.value!.style.left = props.info.position.left + 'px';
-      root.value!.style.top = props.info.position.top + 'px';
+      root.value!.style.left = props.info.widgetStyle.left + 'px';
+      root.value!.style.top = props.info.widgetStyle.top + 'px';
+      root.value!.style.width = props.info.widgetStyle.width + 'px';
+      root.value!.style.height = props.info.widgetStyle.height + 'px';
+      root.value!.style.transform = `rotate(${props.info.widgetStyle.rotate}deg)`;
       root.value!.style.zIndex = '1';
     });
 

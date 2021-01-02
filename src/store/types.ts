@@ -1,8 +1,11 @@
 import {SFCWithInstall} from "element-plus/lib/utils/types";
 
-export interface WidgetPosition {
+export interface WidgetStyle {
   left: number;
   top: number;
+  rotate: number;
+  width: number;
+  height: number;
 }
 
 export interface Widget<T = any> {
@@ -11,7 +14,7 @@ export interface Widget<T = any> {
   name: string;
   label: string;
   icon: string;
-  position: WidgetPosition;
+  widgetStyle: WidgetStyle;
   style: Record<string, number | string>; // object: key: string; val: number | string
   attrs: any;
 }
