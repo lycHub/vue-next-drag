@@ -1,11 +1,11 @@
 import {defineComponent, PropType, markRaw, ref} from "vue";
 import {Widget, WidgetStyle} from "../../../store/types";
-import {Line, LineType, singleOffset, WidgetMoveData, WidgetOffset} from "../types";
+import {Line, singleOffset, WidgetMoveData, WidgetOffset} from "../types";
 import {emitter} from "../bus";
 import {Handler} from "mitt";
-import {canvasOffset, initLines} from "./utils";
+import {canvasOffset, cos, initLines, sin} from "./utils";
 
-
+const dis = 3;
 
 export default defineComponent({
   name: 'Lines',
@@ -17,7 +17,7 @@ export default defineComponent({
   },
   setup(props) {
     let offsetInfo = markRaw<WidgetOffset>({ vertical: [], horizontal: [] });
-
+    const movingWidgetSize = { width: 0, height: 0 };
     const lines = ref<Line[]>(initLines);
     /*watch(() => props.widgets, newVal => {
       if (newVal.length) {
@@ -34,20 +34,30 @@ export default defineComponent({
       }
     }
 
+    const saveWidgetsOffset = (widgets: Widget[]) => {
+      offsetInfo = { vertical: [], horizontal: [] };
+      widgets.forEach(widget => {
+        const info = calculateWidgetOffset(widget.widgetStyle);
+        offsetInfo.vertical.push(...info.vertical);
+        offsetInfo.horizontal.push(...info.horizontal);
+      });
+    }
+
     const handleMove = (data: WidgetMoveData) => {
-      const info = calculateWidgetOffset(data.style);
-      // console.log('handleMove info', info);
+      const info = calculateWidgetOffset(data.style, true);
+      // console.log('handleMove info', movingWidgetSize);
       info.vertical.forEach(v => {
         const lineIndex = lines.value.findIndex(item => item.type === v.type);
-        const nearLine = offsetInfo.vertical.concat(canvasOffset.vertical).find(item => Math.abs(item.offset - v.offset) <= 3);
+        const nearLine = offsetInfo.vertical.concat(canvasOffset.vertical).find(item => Math.abs(item.offset - v.offset) <= dis);
         if (nearLine) {
           lines.value[lineIndex].left = nearLine.offset;
           lines.value[lineIndex].show = true;
-          let result = nearLine.offset;
+          const delta = data.style.rotate ? (data.style.width - movingWidgetSize.width) / 2 : 0;
+          let result = nearLine.offset - delta; // 不论delta正负都是对的
           if (v.type === 'vm') {
-            result= nearLine.offset - data.style.width / 2;
+            result = nearLine.offset - movingWidgetSize.width / 2 - delta;
           } else if (v.type === 'vr') {
-            result= nearLine.offset - data.style.width;
+            result= nearLine.offset - movingWidgetSize.width - delta;
           }
           data.dom.style.left = result + 'px';
         } else {
@@ -56,15 +66,16 @@ export default defineComponent({
       });
       info.horizontal.forEach(h => {
         const lineIndex = lines.value.findIndex(item => item.type === h.type);
-        const nearLine = offsetInfo.horizontal.concat(canvasOffset.horizontal).find(item => Math.abs(item.offset - h.offset) <= 3);
+        const nearLine = offsetInfo.horizontal.concat(canvasOffset.horizontal).find(item => Math.abs(item.offset - h.offset) <= dis);
         if (nearLine) {
           lines.value[lineIndex].top = nearLine.offset;
           lines.value[lineIndex].show = true;
-          let result = nearLine.offset;
+          const delta = data.style.rotate ? (movingWidgetSize.height - data.style.height) / 2 : 0;
+          let result = nearLine.offset + delta;
           if (h.type === 'hm') {
-            result= nearLine.offset - data.style.height / 2;
+            result = nearLine.offset - movingWidgetSize.height / 2 + delta;
           } else if (h.type === 'hb') {
-            result= nearLine.offset - data.style.height;
+            result= nearLine.offset - movingWidgetSize.height + delta;
           }
           data.dom.style.top = result + 'px';
         } else {
@@ -78,26 +89,48 @@ export default defineComponent({
     emitter.on<void>('up', () => {
       // emitter.off<string>('press', handlePress as Handler<string>);
       // emitter.off<WidgetStyle>('move', handleMove as Handler<WidgetStyle>);
-      lines.value.forEach(item => item.show = false);
+      // lines.value.forEach(item => item.show = false);
     });
 
-
-
-
-    const saveWidgetsOffset = (widgets: Widget[]) => {
-      offsetInfo = { vertical: [], horizontal: [] };
-      widgets.forEach(widget => {
-        const info = calculateWidgetOffset(widget.widgetStyle);
-        offsetInfo.vertical.push(...info.vertical);
-        offsetInfo.horizontal.push(...info.horizontal);
-      });
-    }
-
-    const calculateWidgetOffset = (style: WidgetStyle): WidgetOffset => {
+    const calculateWidgetOffset = (style: WidgetStyle, isMovingWidget = false): WidgetOffset => {
       let vertical: singleOffset[] = [];
       let horizontal: singleOffset[] = [];
+      if (isMovingWidget) {
+        movingWidgetSize.width = style.width;
+        movingWidgetSize.height = style.height;
+      }
       if (style.rotate) {
+        const newWidth = style.width * cos(style.rotate) + style.height * sin(style.rotate);
+        const diffX = (style.width - newWidth) / 2; 		// 旋转后范围变小是正值，变大是负值
+        const vl = style.left + diffX;
+        // console.log('diffX', diffX);
+        vertical.push({
+          type: 'vl',
+          offset: vl
+        }, {
+          type: 'vm',
+          offset: vl + Math.abs(newWidth) / 2
+        }, {
+          type: 'vr',
+          offset: vl + newWidth
+        });
 
+        const newHeight = style.height * cos(style.rotate) + style.width * sin(style.rotate);
+        const diffY = (newHeight - style.height) / 2; 		// 始终是正
+        const ht = style.top - diffY;
+        horizontal.push({
+          type: 'ht',
+          offset: ht
+        }, {
+          type: 'hm',
+          offset: ht + newHeight / 2
+        }, {
+          type: 'hb',
+          offset: ht + newHeight
+        });
+        movingWidgetSize.width = newWidth;
+        // movingWidgetSize.height = sin(style.rotate) * style.width;
+        movingWidgetSize.height = newHeight;
       } else {
         const vl = style.left;
         const ht = style.top;

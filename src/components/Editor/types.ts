@@ -29,7 +29,7 @@ export interface DotInfo {
 /*
   if (rotate) {
 	const newWIdth = width * Math.cos(r) + height * Math.sin(r);
-	const diffX = width - newWIdth 		// 旋转后范围变小是正值，变大是负值
+	const diffX = (width - newWIdth) / 2 		// 旋转后范围变小是正值，变大是负值
 	vl: position.left + diffX
 	vm: vl + Math.abs(newWIdth) / 2
 	vr: vl + newWIdth

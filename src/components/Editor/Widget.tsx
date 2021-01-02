@@ -1,5 +1,5 @@
-import {defineComponent, onMounted, ref, PropType, computed, nextTick} from "vue";
-import {Widget, WidgetStyle} from "../../store/types";
+import {defineComponent, onMounted, ref, PropType, computed} from "vue";
+import {Widget} from "../../store/types";
 import {useStore} from "../../store";
 import Dot from './Dot';
 import {Direct, DotInfo, DragStartInfo, WidgetMoveData} from "./types";
@@ -61,6 +61,7 @@ export default defineComponent({
           }
         }
       });
+      // root.value!.style.transform = 'rotate(60deg)';
       emitter.emit<void>('up');
     }
 
@@ -140,6 +141,7 @@ export default defineComponent({
       root.value!.style.height = props.info.widgetStyle.height + 'px';
       root.value!.style.transform = `rotate(${props.info.widgetStyle.rotate}deg)`;
       root.value!.style.zIndex = '1';
+      // root.value!.setAttribute('in-canvas', 'true');
     });
 
     const renderDots = () => {
@@ -148,9 +150,14 @@ export default defineComponent({
       });
     }
 
+    const handleClick = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
     return () => {
       return (
-        <div class={ ['widget', { active: isActive.value }] } ref={ root } onMousedown={ handleMousedown }>
+        <div class={ ['widget', { active: isActive.value }] } ref={ root } onClick={ handleClick } onMousedown={ handleMousedown }>
           { isActive.value ? renderDots() : null }
           { slots.default!() }
         </div>
