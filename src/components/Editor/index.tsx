@@ -1,4 +1,4 @@
-import {defineComponent, h, computed, markRaw} from "vue";
+import {defineComponent, h, computed, markRaw, resolveComponent} from "vue";
 import Widget from "./Widget";
 import Lines from "./Lines";
 import './index.scss';
@@ -10,13 +10,11 @@ export default defineComponent({
   name: 'Editor',
   setup(props) {
     const store = useStore();
-    // const widgets = computed(() => store.state.editor.widgets);
     const widgets = store.state.editor.widgets;
     const renderWidgets = () => {
       return widgets.length ? widgets.map(item => {
-        const { width, height, ...rest } = item.style;
         return <Widget info={ item } >
-          { h(item.component, { ...item.attrs, style: item.style }, { default: () => item.label }) }
+          { h(resolveComponent(item.component), { ...item.attrs, style: item.style }, () => item.label) }
         </Widget>;
       }) : null;
     }

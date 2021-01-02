@@ -1,9 +1,7 @@
 import {Widget} from "./types";
-import Button from "element-plus/lib/el-button/src/button.vue";
-import { ElButton } from 'element-plus';
 
-export const elBtn: Widget<typeof Button> = {
-  component: ElButton,
+export const elBtn = {
+  component: 'el-button',
   name: '按钮',
   label: '按钮',
   icon: 'el-icon-thumb',

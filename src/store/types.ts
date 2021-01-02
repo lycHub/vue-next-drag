@@ -8,9 +8,9 @@ export interface WidgetStyle {
   height: number;
 }
 
-export interface Widget<T = any> {
+export interface Widget {
   id?: string;
-  component: SFCWithInstall<T>;
+  component: string;
   name: string;
   label: string;
   icon: string;
