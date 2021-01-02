@@ -1,6 +1,6 @@
 <template>
   <div>
-    dsadasdas撒飞洒
+    全局testaaa  ccc
   </div>
 </template>
 <script>
