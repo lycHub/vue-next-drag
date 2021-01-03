@@ -1,6 +1,6 @@
 import {defineComponent, PropType} from "vue";
-import {DotInfo, MoveStartInfo, WidgetMoveData} from "./types";
-import {emitter} from "./bus";
+import {DotInfo, MoveStartInfo, WidgetMoveData} from "../types";
+import {emitter} from "../bus";
 
 export default defineComponent({
   name: 'Dot',
@@ -46,7 +46,7 @@ export default defineComponent({
       return (
         <div
           class="dot"
-          style={{ left: props.info.left + 'px', top: props.info.top + 'px', cursor: props.info.type + '-resize' }}
+          style={{ left: props.info.left + 'px', top: props.info.top + 'px', cursor: props.info.trueType + '-resize' }}
           onMousedown={ handleMousedown }
         >
         </div>

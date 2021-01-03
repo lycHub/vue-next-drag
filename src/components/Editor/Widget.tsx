@@ -1,12 +1,11 @@
 import {defineComponent, onMounted, ref, PropType, computed, h} from "vue";
 import {Widget} from "../../store/types";
 import {useStore} from "../../store";
-import Dot from './Dot';
+import Dot from './Dot/index';
 import {Direct, DotInfo, DragStartInfo, WidgetMoveData} from "./types";
 import {emitter} from "./bus";
-import {cos, sin} from "../../utils";
-
-const LimitSize = 10;
+import {MoveDiff, stretchStrategy} from "./stretch";
+import {calculateDotInfo} from "./Dot/dot";
 
 export default defineComponent({
   name: 'Widget',
@@ -92,91 +91,8 @@ export default defineComponent({
       };
     }
 
-
-    onMounted(() => {
-      root.value!.style.left = props.info.widgetStyle.left + 'px';
-      root.value!.style.top = props.info.widgetStyle.top + 'px';
-      root.value!.style.width = props.info.widgetStyle.width + 'px';
-      root.value!.style.height = props.info.widgetStyle.height + 'px';
-      root.value!.style.transform = `rotate(${props.info.widgetStyle.rotate}deg)`;
-      root.value!.style.zIndex = '1';
-      // root.value!.setAttribute('in-canvas', 'true');
-    });
-
-    const handleDotMove = (type: string, diff: { diffX: number; diffY: number }) => {
-      const { minSize, rotate, width, height, top, left } = props.info.widgetStyle;
-      if (type === 'n') {
-        const newHeight = limitMinNum(height - diff.diffY, minSize.height);
-        if (newHeight > minSize.height) {
-          root.value!.style.height = newHeight + 'px';
-          root.value!.style.top = (top + diff.diffY) + 'px';
-          // root.value!.style.left = (left - diff.diffY / 2 * sin(rotate)) + 'px';
-          generateDots();
-        }
-      } else if (type === 'e') {
-        const newWidth = limitMinNum(width + diff.diffX, minSize.width);
-        if (newWidth > minSize.width) {
-          root.value!.style.width = newWidth + 'px';
-          generateDots();
-        }
-      } else if (type === 's') {
-        const newHeight = limitMinNum(height + diff.diffY, minSize.height);
-        if (newHeight > minSize.height) {
-          root.value!.style.height = newHeight + 'px';
-          generateDots();
-        }
-      } else if (type === 'w') {
-        const newWidth = limitMinNum(width - diff.diffX, minSize.width);
-        if (newWidth > minSize.width) {
-          root.value!.style.width = newWidth + 'px';
-          root.value!.style.left = (left + diff.diffX) + 'px';
-          generateDots();
-        }
-      } else if (type === 'nw') {
-        const newHeight = limitMinNum(height - diff.diffY, minSize.height);
-        const newWidth = limitMinNum(width - diff.diffX, minSize.width);
-        if (newHeight > minSize.height) {
-          root.value!.style.height = newHeight + 'px';
-          root.value!.style.top = (top + diff.diffY) + 'px';
-        }
-        if (newWidth > minSize.width) {
-          root.value!.style.width = newWidth + 'px';
-          root.value!.style.left = (left + diff.diffX) + 'px';
-        }
-        generateDots();
-      } else if (type === 'ne') {
-        const newHeight = limitMinNum(height - diff.diffY, minSize.height);
-        const newWidth = limitMinNum(width + diff.diffX, minSize.width);
-        if (newHeight > minSize.height) {
-          root.value!.style.height = newHeight + 'px';
-          root.value!.style.top = (top + diff.diffY) + 'px';
-        }
-        if (newWidth > minSize.width) {
-          root.value!.style.width = newWidth + 'px';
-        }
-        generateDots();
-      } else if (type === 'se') {
-        const newHeight = limitMinNum(height + diff.diffY, minSize.height);
-        const newWidth = limitMinNum(width + diff.diffX, minSize.width);
-        if (newHeight > minSize.height) {
-          root.value!.style.height = newHeight + 'px';
-        }
-        if (newWidth > minSize.width) {
-          root.value!.style.width = newWidth + 'px';
-        }
-        generateDots();
-      } else if (type === 'sw') {
-        const newHeight = limitMinNum(height + diff.diffY, minSize.height);
-        const newWidth = limitMinNum(width - diff.diffX, minSize.width);
-        if (newHeight > minSize.height) {
-          root.value!.style.height = newHeight + 'px';
-        }
-        if (newWidth > minSize.width) {
-          root.value!.style.width = newWidth + 'px';
-          root.value!.style.left = (left + diff.diffX) + 'px';
-        }
-        generateDots();
-      }
+    const handleDotMove = (type: string, diff: MoveDiff) => {
+      stretchStrategy[type](props.info.widgetStyle, diff, root.value!, () => generateDots());
     }
 
     const handleDotUp = () => {
@@ -202,55 +118,16 @@ export default defineComponent({
       const height = root.value!.clientHeight;
       dots.value = [];
       Object.entries(Direct).forEach(([type, value]) => {
-        dots.value.push(calculateDotInfo(type, value, width, height));
+        dots.value.push(calculateDotInfo(type, value, width, height, props.info.widgetStyle.rotate));
       });
-    }
-
-    const calculateDotInfo = (type: string, value: string, width: number, height: number): DotInfo => {
-      let left = 0;
-      let top = 0;
-      switch (value) {
-        case '右上':
-          left = width;
-          top = 0;
-          break;
-        case '左下':
-          left = 0;
-          top = height;
-          break;
-        case '右下':
-          left = width;
-          top = height;
-          break;
-        case '左':
-          left = 0;
-          top = height / 2;
-          break;
-        case '右':
-          left = width;
-          top = height / 2;
-          break;
-        case '上':
-          left = width / 2;
-          top = 0;
-          break;
-        case '下':
-          left = width / 2;
-          top = height;
-          break;
-      }
-      return { type, left, top };
-    }
-
-    const limitMinNum = (num: number, limit: number): number => {
-      return Math.max(num, limit);
     }
 
     const renderDots = () => {
       return dots.value.map(item => {
+        let trueType = item.trueType;
         return h(Dot, {
           info: item,
-          onMove: handleDotMove.bind(null, item.type),
+          onMove: handleDotMove.bind(null, trueType),
           onUp: handleDotUp
         });
       });
@@ -260,6 +137,17 @@ export default defineComponent({
       event.preventDefault();
       event.stopPropagation();
     }
+
+
+    onMounted(() => {
+      root.value!.style.left = props.info.widgetStyle.left + 'px';
+      root.value!.style.top = props.info.widgetStyle.top + 'px';
+      root.value!.style.width = props.info.widgetStyle.width + 'px';
+      root.value!.style.height = props.info.widgetStyle.height + 'px';
+      root.value!.style.transform = `rotate(${props.info.widgetStyle.rotate}deg)`;
+      root.value!.style.zIndex = '1';
+      // root.value!.setAttribute('in-canvas', 'true');
+    });
 
     return () => {
       return (

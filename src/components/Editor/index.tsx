@@ -1,4 +1,4 @@
-import {defineComponent, h, computed, markRaw, resolveComponent} from "vue";
+import {defineComponent, h, resolveComponent} from "vue";
 import Widget from "./Widget";
 import Lines from "./Lines";
 import './index.scss';
@@ -33,14 +33,13 @@ export default defineComponent({
           const widget = cloneDeep(WidgetList[+index]);
           widget.widgetStyle.left = event.offsetX;
           widget.widgetStyle.top = event.offsetY;
-          widget.widgetStyle.rotate = 90;
+          // widget.widgetStyle.rotate = 90;
           widget.id = uniqueId('widget-');
           store.commit('editor/addWidget', widget);
           // console.log('target', widget);
         }
       }
     }
-
 
     return () => {
       return (

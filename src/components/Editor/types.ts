@@ -24,6 +24,7 @@ export enum Direct {
 
 export interface DotInfo {
   type: string;
+  trueType: string;
   left: number;
   top: number;
 }
