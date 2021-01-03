@@ -124,10 +124,10 @@ export default defineComponent({
 
     const renderDots = () => {
       return dots.value.map(item => {
-        let trueType = item.trueType;
+        // let trueType = item.trueType;
         return h(Dot, {
           info: item,
-          onMove: handleDotMove.bind(null, trueType),
+          onMove: handleDotMove.bind(null, item.type),
           onUp: handleDotUp
         });
       });

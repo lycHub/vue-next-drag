@@ -1,5 +1,6 @@
 import {WidgetStyle} from "../../store/types";
 import {Direct} from "./types";
+import {sin} from "../../utils";
 
 export interface MoveDiff {
   diffX: number;
@@ -11,13 +12,18 @@ function limitMinNum(num: number, limit: number): number {
 }
 
 function stretchN(widgetStyle: WidgetStyle, diff: MoveDiff, root: HTMLElement, callback: () => void) {
-  const { minSize, height, top } = widgetStyle;
-  const newHeight = limitMinNum(height - diff.diffY, minSize.height);
-  // console.log('stretchN', newHeight);
+  const { minSize, height, top, left, rotate } = widgetStyle;
+  let distance = Math.sqrt(Math.pow(diff.diffX,2) + Math.pow(diff.diffY,2));
+  if (diff.diffY < 0) {
+    distance = -distance;
+  }
+  const newHeight = limitMinNum(height - distance, minSize.height);
+  // console.log('diffY', diff.diffY);
+  // console.log('distance', distance);
   if (newHeight > minSize.height) {
     root.style.height = newHeight + 'px';
-    root.style.top = (top + diff.diffY) + 'px';
-    // root.value!.style.left = (left - diff.diffY / 2 * sin(rotate)) + 'px';
+    root.style.top = (top + distance) + 'px';
+    root.style.left = (left - distance / 2 * sin(rotate)) + 'px';
     callback();
   }
 }
