@@ -1,9 +1,12 @@
-import {defineComponent, onMounted, ref, PropType, computed} from "vue";
+import {defineComponent, onMounted, ref, PropType, computed, h} from "vue";
 import {Widget} from "../../store/types";
 import {useStore} from "../../store";
 import Dot from './Dot';
 import {Direct, DotInfo, DragStartInfo, WidgetMoveData} from "./types";
 import {emitter} from "./bus";
+import {cos, sin} from "../../utils";
+
+const LimitSize = 10;
 
 export default defineComponent({
   name: 'Widget',
@@ -34,6 +37,21 @@ export default defineComponent({
         document.removeEventListener('mouseup', handleMouseUp);
       }
     }
+
+    const handleMousedown = (event: MouseEvent) => {
+      event.preventDefault();
+      startInfo = {
+        x: event.clientX,
+        y: event.clientY,
+        left: root.value!.offsetLeft, // left和top第一次等于props.info.position
+        top: root.value!.offsetTop
+      };
+      root.value!.style.zIndex = '2';
+      emitter.emit<string>('press', props.info.id);
+      setActive();
+      toggleMoving(true);
+    }
+
     const handleMouseMove = (event: MouseEvent) => {
       event.preventDefault();
       const diffX = event.clientX - startInfo!.x;
@@ -65,20 +83,6 @@ export default defineComponent({
       emitter.emit<void>('up');
     }
 
-    const handleMousedown = (event: MouseEvent) => {
-      event.preventDefault();
-      startInfo = {
-        x: event.clientX,
-        y: event.clientY,
-        left: root.value!.offsetLeft, // left和top第一次等于props.info.position
-        top: root.value!.offsetTop
-      };
-      root.value!.style.zIndex = '2';
-      emitter.emit<string>('press', props.info.id);
-      setActive();
-      toggleMoving(true);
-    }
-
     const calculate = (diffX: number, diffY: number): { left: number; top: number } => {
       let newLeft = startInfo!.left + diffX;
       let newTop = startInfo!.top + diffY;
@@ -87,6 +91,111 @@ export default defineComponent({
         top: newTop
       };
     }
+
+
+    onMounted(() => {
+      root.value!.style.left = props.info.widgetStyle.left + 'px';
+      root.value!.style.top = props.info.widgetStyle.top + 'px';
+      root.value!.style.width = props.info.widgetStyle.width + 'px';
+      root.value!.style.height = props.info.widgetStyle.height + 'px';
+      root.value!.style.transform = `rotate(${props.info.widgetStyle.rotate}deg)`;
+      root.value!.style.zIndex = '1';
+      // root.value!.setAttribute('in-canvas', 'true');
+    });
+
+    const handleDotMove = (type: string, diff: { diffX: number; diffY: number }) => {
+      const { minSize, rotate, width, height, top, left } = props.info.widgetStyle;
+      if (type === 'n') {
+        const newHeight = limitMinNum(height - diff.diffY, minSize.height);
+        if (newHeight > minSize.height) {
+          root.value!.style.height = newHeight + 'px';
+          root.value!.style.top = (top + diff.diffY) + 'px';
+          // root.value!.style.left = (left - diff.diffY / 2 * sin(rotate)) + 'px';
+          generateDots();
+        }
+      } else if (type === 'e') {
+        const newWidth = limitMinNum(width + diff.diffX, minSize.width);
+        if (newWidth > minSize.width) {
+          root.value!.style.width = newWidth + 'px';
+          generateDots();
+        }
+      } else if (type === 's') {
+        const newHeight = limitMinNum(height + diff.diffY, minSize.height);
+        if (newHeight > minSize.height) {
+          root.value!.style.height = newHeight + 'px';
+          generateDots();
+        }
+      } else if (type === 'w') {
+        const newWidth = limitMinNum(width - diff.diffX, minSize.width);
+        if (newWidth > minSize.width) {
+          root.value!.style.width = newWidth + 'px';
+          root.value!.style.left = (left + diff.diffX) + 'px';
+          generateDots();
+        }
+      } else if (type === 'nw') {
+        const newHeight = limitMinNum(height - diff.diffY, minSize.height);
+        const newWidth = limitMinNum(width - diff.diffX, minSize.width);
+        if (newHeight > minSize.height) {
+          root.value!.style.height = newHeight + 'px';
+          root.value!.style.top = (top + diff.diffY) + 'px';
+        }
+        if (newWidth > minSize.width) {
+          root.value!.style.width = newWidth + 'px';
+          root.value!.style.left = (left + diff.diffX) + 'px';
+        }
+        generateDots();
+      } else if (type === 'ne') {
+        const newHeight = limitMinNum(height - diff.diffY, minSize.height);
+        const newWidth = limitMinNum(width + diff.diffX, minSize.width);
+        if (newHeight > minSize.height) {
+          root.value!.style.height = newHeight + 'px';
+          root.value!.style.top = (top + diff.diffY) + 'px';
+        }
+        if (newWidth > minSize.width) {
+          root.value!.style.width = newWidth + 'px';
+        }
+        generateDots();
+      } else if (type === 'se') {
+        const newHeight = limitMinNum(height + diff.diffY, minSize.height);
+        const newWidth = limitMinNum(width + diff.diffX, minSize.width);
+        if (newHeight > minSize.height) {
+          root.value!.style.height = newHeight + 'px';
+        }
+        if (newWidth > minSize.width) {
+          root.value!.style.width = newWidth + 'px';
+        }
+        generateDots();
+      } else if (type === 'sw') {
+        const newHeight = limitMinNum(height + diff.diffY, minSize.height);
+        const newWidth = limitMinNum(width - diff.diffX, minSize.width);
+        if (newHeight > minSize.height) {
+          root.value!.style.height = newHeight + 'px';
+        }
+        if (newWidth > minSize.width) {
+          root.value!.style.width = newWidth + 'px';
+          root.value!.style.left = (left + diff.diffX) + 'px';
+        }
+        generateDots();
+      }
+    }
+
+    const handleDotUp = () => {
+      const { widgetStyle, ...rest } = props.info;
+      store.commit('editor/updateWidget', {
+        id: props.info.id,
+        widget: {
+          ...rest,
+          widgetStyle: {
+            ...widgetStyle,
+            width: root.value!.clientWidth,
+            height: root.value!.clientHeight,
+            top: root.value!.offsetTop,
+            left: root.value!.offsetLeft
+          }
+        }
+      });
+    }
+
 
     const generateDots = () => {
       const width = root.value!.clientWidth;
@@ -133,20 +242,17 @@ export default defineComponent({
       return { type, left, top };
     }
 
-
-    onMounted(() => {
-      root.value!.style.left = props.info.widgetStyle.left + 'px';
-      root.value!.style.top = props.info.widgetStyle.top + 'px';
-      root.value!.style.width = props.info.widgetStyle.width + 'px';
-      root.value!.style.height = props.info.widgetStyle.height + 'px';
-      root.value!.style.transform = `rotate(${props.info.widgetStyle.rotate}deg)`;
-      root.value!.style.zIndex = '1';
-      // root.value!.setAttribute('in-canvas', 'true');
-    });
+    const limitMinNum = (num: number, limit: number): number => {
+      return Math.max(num, limit);
+    }
 
     const renderDots = () => {
       return dots.value.map(item => {
-        return <Dot info={ item } />;
+        return h(Dot, {
+          info: item,
+          onMove: handleDotMove.bind(null, item.type),
+          onUp: handleDotUp
+        });
       });
     }
 

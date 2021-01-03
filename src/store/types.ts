@@ -1,11 +1,10 @@
-import {SFCWithInstall} from "element-plus/lib/utils/types";
-
 export interface WidgetStyle {
   left: number;
   top: number;
   rotate: number;
   width: number;
   height: number;
+  minSize: { width: number; height: number };
 }
 
 export interface Widget {

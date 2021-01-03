@@ -3,7 +3,8 @@ import {Widget, WidgetStyle} from "../../../store/types";
 import {Line, singleOffset, WidgetMoveData, WidgetOffset} from "../types";
 import {emitter} from "../bus";
 import {Handler} from "mitt";
-import {canvasOffset, cos, initLines, sin} from "./utils";
+import {canvasOffset, initLines} from "./utils";
+import {sin, cos} from "../../../utils";
 
 const dis = 3;
 
@@ -89,7 +90,7 @@ export default defineComponent({
     emitter.on<void>('up', () => {
       // emitter.off<string>('press', handlePress as Handler<string>);
       // emitter.off<WidgetStyle>('move', handleMove as Handler<WidgetStyle>);
-      // lines.value.forEach(item => item.show = false);
+      lines.value.forEach(item => item.show = false);
     });
 
     const calculateWidgetOffset = (style: WidgetStyle, isMovingWidget = false): WidgetOffset => {

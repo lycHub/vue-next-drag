@@ -1,5 +1,6 @@
 import {defineComponent, PropType} from "vue";
-import {DotInfo} from "./types";
+import {DotInfo, MoveStartInfo, WidgetMoveData} from "./types";
+import {emitter} from "./bus";
 
 export default defineComponent({
   name: 'Dot',
@@ -9,13 +10,44 @@ export default defineComponent({
       required: true
     }
   },
-  setup(props) {
-    const { left, top, type } = props.info;
+  emits: ['move', 'up'],
+  setup(props, { emit }) {
+    const startInfo: MoveStartInfo = { x: 0, y: 0 };
+    const handleMousedown = (event: MouseEvent) => {
+      event.stopPropagation();
+      startInfo.x = event.clientX;
+      startInfo.y = event.clientY;
+      toggleMoving(true);
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      event.preventDefault();
+      const diffX = event.clientX - startInfo.x;
+      const diffY = event.clientY - startInfo.y;
+      emit('move', { diffX, diffY });
+    }
+    const handleMouseUp = () => {
+      toggleMoving(false);
+      emit('up');
+    }
+
+
+    const toggleMoving = (movable: boolean) => {
+      if (movable) {
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+      } else {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      }
+    }
+
     return () => {
       return (
         <div
           class="dot"
-          style={{ left: left + 'px', top: top + 'px', cursor: type + '-resize' }}
+          style={{ left: props.info.left + 'px', top: props.info.top + 'px', cursor: props.info.type + '-resize' }}
+          onMousedown={ handleMousedown }
         >
         </div>
       );

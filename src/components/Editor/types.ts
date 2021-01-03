@@ -1,8 +1,11 @@
 import {WidgetStyle} from "../../store/types";
 
-export interface DragStartInfo {
+export interface MoveStartInfo {
   x: number;
   y: number;
+}
+
+export interface DragStartInfo extends MoveStartInfo {
   left: number;
   top: number;
 }

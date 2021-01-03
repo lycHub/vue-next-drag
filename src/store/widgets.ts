@@ -6,6 +6,10 @@ export const elBtn = {
   label: '按钮',
   icon: 'el-icon-thumb',
   widgetStyle: {
+    minSize: {
+      width: 42,
+      height: 26
+    },
     left: 0,
     top: 0,
     width: 70,
