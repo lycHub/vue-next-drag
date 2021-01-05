@@ -2,10 +2,11 @@ import {defineComponent, onMounted, ref, PropType, computed, h} from "vue";
 import {Widget} from "../../store/types";
 import {useStore} from "../../store";
 import Dot from './Dot/index';
-import {Direct, DotInfo, DragStartInfo, WidgetMoveData} from "./types";
+import {Direct, DotInfo, DotMouseDownInfo, DragStartInfo, MoveStartInfo, WidgetMoveData} from "./types";
 import {emitter} from "./bus";
 import {MoveDiff, stretchStrategy} from "./stretch";
 import {calculateDotInfo} from "./Dot/dot";
+import {getPoint} from "../../utils";
 
 export default defineComponent({
   name: 'Widget',
@@ -91,8 +92,27 @@ export default defineComponent({
       };
     }
 
-    const handleDotMove = (type: string, diff: MoveDiff) => {
-      stretchStrategy[type](props.info.widgetStyle, diff, root.value!, () => generateDots());
+    let dotMousedownInfo: DotMouseDownInfo;
+
+    const handleDotDown = (type: string) => {
+      // step1: handlePoint旋转后的坐标
+      const { widgetStyle } = props.info;
+      const center = {
+        x: widgetStyle.left + (widgetStyle.width / 2),
+        y: widgetStyle.top + (widgetStyle.height / 2)
+      }
+      const handlePoint = getPoint(widgetStyle, center, type);
+
+      // ??
+      const sPoint = {
+        x: center.x + Math.abs(handlePoint.x - center.x) * (handlePoint.x < center.x ? 1 : -1),
+        y: center.y + Math.abs(handlePoint.y - center.y) * (handlePoint.y < center.y ? 1 : -1)
+      }
+      dotMousedownInfo = { handlePoint, center, sPoint }
+    }
+
+    const handleDotMove = (type: string, position: MoveStartInfo) => {
+      stretchStrategy[type](dotMousedownInfo, props.info.widgetStyle, position, root.value!, () => generateDots());
     }
 
     const handleDotUp = () => {
@@ -127,6 +147,7 @@ export default defineComponent({
         // let trueType = item.trueType;
         return h(Dot, {
           info: item,
+          onDown: handleDotDown.bind(null, item.type),
           onMove: handleDotMove.bind(null, item.type),
           onUp: handleDotUp
         });

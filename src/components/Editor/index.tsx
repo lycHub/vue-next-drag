@@ -1,4 +1,4 @@
-import {defineComponent, h, resolveComponent} from "vue";
+import {defineComponent, h, resolveComponent, ref, onMounted} from "vue";
 import Widget from "./Widget";
 import Lines from "./Lines";
 import './index.scss';
@@ -41,11 +41,18 @@ export default defineComponent({
       }
     }
 
+    const canvas = ref<HTMLElement>();
+    // onMounted(() => {
+    //   console.log('canvas', canvas.value!.offsetTop);
+    //   console.log('canvas', canvas.value!.clientTop);
+    //   console.log('canvas', canvas.value!.getBoundingClientRect());
+    // })
+
     return () => {
       return (
         <div class="editor-container">
           <div class="editor-box">
-            <div class="canvas" onDragover={ handleDragOver } onDrop={ handleDrop }>
+            <div ref={ canvas } class="canvas" onDragover={ handleDragOver } onDrop={ handleDrop }>
               { renderWidgets() }
               <Lines widgets={ widgets } />
             </div>

@@ -29,6 +29,12 @@ export interface DotInfo {
   top: number;
 }
 
+export interface DotMouseDownInfo {
+  handlePoint: MoveStartInfo;
+  center: MoveStartInfo;
+  sPoint: MoveStartInfo;
+}
+
 
 /*
   if (rotate) {

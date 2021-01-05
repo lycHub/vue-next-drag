@@ -10,21 +10,23 @@ export default defineComponent({
       required: true
     }
   },
-  emits: ['move', 'up'],
+  emits: ['down', 'move', 'up'],
   setup(props, { emit }) {
     const startInfo: MoveStartInfo = { x: 0, y: 0 };
     const handleMousedown = (event: MouseEvent) => {
       event.stopPropagation();
       startInfo.x = event.clientX;
       startInfo.y = event.clientY;
+      emit('down' );
       toggleMoving(true);
     }
 
     const handleMouseMove = (event: MouseEvent) => {
       event.preventDefault();
-      const diffX = event.clientX - startInfo.x;
-      const diffY = event.clientY - startInfo.y;
-      emit('move', { diffX, diffY });
+      // const diffX = event.clientX - startInfo.x;
+      // const diffY = event.clientY - startInfo.y;
+      // emit('move', { diffX, diffY });
+      emit('move', { x: event.clientX - 569, y: event.clientY - 114 });
     }
     const handleMouseUp = () => {
       toggleMoving(false);
