@@ -102,12 +102,15 @@ export default defineComponent({
         y: widgetStyle.top + (widgetStyle.height / 2)
       }
       const handlePoint = getPoint(widgetStyle, center, type);
-
-      // ??
-      const sPoint = {
+     /* const sPoint = {
         x: center.x + Math.abs(handlePoint.x - center.x) * (handlePoint.x < center.x ? 1 : -1),
         y: center.y + Math.abs(handlePoint.y - center.y) * (handlePoint.y < center.y ? 1 : -1)
+      }*/
+      const sPoint = {
+        x: center.x - (handlePoint.x - center.x),
+        y: center.y - (handlePoint.y - center.y)
       }
+      // console.log('sPoint', sPoint);
       dotMousedownInfo = { handlePoint, center, sPoint }
     }
 

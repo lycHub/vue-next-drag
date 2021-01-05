@@ -7,15 +7,20 @@ import {RootState} from "../types";
 export interface EditorState {
   widgets: Widget[];
   activeWidgetIds: string[];
+  canvasRect: DOMRect | null;
 }
 
 const editor: Module<EditorState, RootState> = {
   namespaced: true,
   state: {
-    widgets: [], // 可能会引起不必要的开销
-    activeWidgetIds: []
+    widgets: [],
+    activeWidgetIds: [],
+    canvasRect: null
   },
   mutations: {
+    setCanvasRect(state, canvasRect: DOMRect) {
+      state.canvasRect = canvasRect;
+    },
     setActivateWidgetIds(state, ids: string[]) {
       state.activeWidgetIds = ids;
     },

@@ -42,11 +42,10 @@ export default defineComponent({
     }
 
     const canvas = ref<HTMLElement>();
-    // onMounted(() => {
-    //   console.log('canvas', canvas.value!.offsetTop);
-    //   console.log('canvas', canvas.value!.clientTop);
-    //   console.log('canvas', canvas.value!.getBoundingClientRect());
-    // })
+    onMounted(() => {
+      store.commit('editor/setCanvasRect', canvas.value!.getBoundingClientRect());
+      // console.log('canvas', canvas.value!.getBoundingClientRect());
+    })
 
     return () => {
       return (
@@ -54,7 +53,7 @@ export default defineComponent({
           <div class="editor-box">
             <div ref={ canvas } class="canvas" onDragover={ handleDragOver } onDrop={ handleDrop }>
               { renderWidgets() }
-              <Lines widgets={ widgets } />
+              <Lines canvasRect={ store.state.editor.canvasRect } widgets={ widgets } />
             </div>
             <div class="drag-height">
               <span>拖动调节高度</span>

@@ -1,9 +1,9 @@
-import {defineComponent, PropType, markRaw, ref} from "vue";
+import {defineComponent, PropType, markRaw, ref, onMounted, nextTick} from "vue";
 import {Widget, WidgetStyle} from "../../../store/types";
 import {Line, singleOffset, WidgetMoveData, WidgetOffset} from "../types";
 import {emitter} from "../bus";
 import {Handler} from "mitt";
-import {canvasOffset, initLines} from "./utils";
+import {getCanvasOffset, initLines} from "./utils";
 import {sin, cos} from "../../../utils";
 
 const dis = 3;
@@ -14,9 +14,22 @@ export default defineComponent({
     widgets: {
       type: Array as PropType<Widget[]>,
       default: () => []
+    },
+    canvasRect: {
+      type: Object as PropType<DOMRect | null>,
+      required: true
     }
   },
   setup(props) {
+    let canvasOffset: WidgetOffset;
+    onMounted(() => {
+      nextTick(() => {
+        if (props.canvasRect) {
+          canvasOffset = getCanvasOffset(props.canvasRect);
+        }
+      })
+    });
+
     let offsetInfo = markRaw<WidgetOffset>({ vertical: [], horizontal: [] });
     const movingWidgetSize = { width: 0, height: 0 };
     const lines = ref<Line[]>(initLines);

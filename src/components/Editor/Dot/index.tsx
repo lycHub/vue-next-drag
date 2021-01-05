@@ -1,6 +1,6 @@
 import {defineComponent, PropType} from "vue";
-import {DotInfo, MoveStartInfo, WidgetMoveData} from "../types";
-import {emitter} from "../bus";
+import {DotInfo, MoveStartInfo} from "../types";
+import {useStore} from "../../../store";
 
 export default defineComponent({
   name: 'Dot',
@@ -12,6 +12,7 @@ export default defineComponent({
   },
   emits: ['down', 'move', 'up'],
   setup(props, { emit }) {
+    const store = useStore();
     const startInfo: MoveStartInfo = { x: 0, y: 0 };
     const handleMousedown = (event: MouseEvent) => {
       event.stopPropagation();
@@ -26,7 +27,8 @@ export default defineComponent({
       // const diffX = event.clientX - startInfo.x;
       // const diffY = event.clientY - startInfo.y;
       // emit('move', { diffX, diffY });
-      emit('move', { x: event.clientX - 569, y: event.clientY - 114 });
+      const { left, top } = store.state.editor.canvasRect!;
+      emit('move', { x: event.clientX - left, y: event.clientY - top });
     }
     const handleMouseUp = () => {
       toggleMoving(false);

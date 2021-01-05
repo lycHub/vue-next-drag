@@ -51,7 +51,7 @@ export function getRotatedPoint(point: MoveStartInfo, center: MoveStartInfo, rot
    *  点a(x, y)
    *  旋转中心c(x, y)
    *  旋转后点n(x, y)
-   *  旋转角度θ
+   *  旋转角度θ                tan ??
    * nx = cosθ * (ax - cx) - sinθ * (ay - cy) + cx
    * ny = sinθ * (ax - cx) + cosθ * (ay - cy) + cy
    */
