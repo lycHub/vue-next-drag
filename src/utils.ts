@@ -70,13 +70,33 @@ export function getRotatedPoint(point: MoveStartInfo, center: MoveStartInfo, rot
  * @return {Object}          旋转后的手柄坐标
  */
 export function getPoint(widgetStyle: WidgetStyle, center: MoveStartInfo, type: string): MoveStartInfo {
-  // switch (position) {
-  //   case 'top-middle':
-  //
-  // }
-  const point = {
-    x: widgetStyle.left + (widgetStyle.width / 2),
-    y: widgetStyle.top
+  console.log('type', type);
+  let point: MoveStartInfo;
+  switch (type) {
+    case 's':
+      point = {
+        x: widgetStyle.left + (widgetStyle.width / 2),
+        y: widgetStyle.top + widgetStyle.height
+      }
+      break;
+      case 'w':
+        point = {
+          x: widgetStyle.left,
+          y: widgetStyle.top + widgetStyle.height / 2
+        }
+      break;
+      case 'e':
+        point = {
+          x: widgetStyle.left + widgetStyle.width,
+          y: widgetStyle.top + widgetStyle.height / 2
+        }
+      break;
+    default: // n
+      point = {
+        x: widgetStyle.left + (widgetStyle.width / 2),
+        y: widgetStyle.top
+      }
+      break;
   }
-  return getRotatedPoint(point, center, widgetStyle.rotate)
+  return getRotatedPoint(point, center, widgetStyle.rotate);
 }

@@ -110,8 +110,8 @@ export default defineComponent({
         x: center.x - (handlePoint.x - center.x),
         y: center.y - (handlePoint.y - center.y)
       }
-      // console.log('sPoint', sPoint);
       dotMousedownInfo = { handlePoint, center, sPoint }
+      // console.log('dotMousedownInfo', dotMousedownInfo);
     }
 
     const handleDotMove = (type: string, position: MoveStartInfo) => {
