@@ -37,6 +37,16 @@
           };
           z-index: 1;
         }
+        .rotate {
+          position: absolute;
+          left: 50%;
+          margin-left: -8px;
+          top: -24px;
+          font-size: 18px;
+          color: #f60;
+          z-index: 1;
+          cursor: pointer;
+        }
       }
       .line {
         display: none;

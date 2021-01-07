@@ -175,6 +175,7 @@ export default defineComponent({
     return () => {
       return (
         <div class={ ['widget', { active: isActive.value }] } ref={ root } onClick={ handleClick } onMousedown={ handleMousedown }>
+          <i v-show={ isActive.value } class="el-icon-refresh-right rotate"></i>
           { isActive.value ? renderDots() : null }
           { slots.default!() }
         </div>
