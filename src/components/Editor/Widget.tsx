@@ -147,7 +147,6 @@ export default defineComponent({
 
     const renderDots = () => {
       return dots.value.map(item => {
-        // let trueType = item.trueType;
         return h(Dot, {
           info: item,
           onDown: handleDotDown.bind(null, item.type),

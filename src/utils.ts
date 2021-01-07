@@ -38,6 +38,16 @@ export function conversionRotateToQuadrant(rotate: number): number {
 }
 
 
+// 求两点之间的中点坐标
+export function getCenterPoint(p1: MoveStartInfo, p2: MoveStartInfo) {
+  return {
+    x: p1.x + ((p2.x - p1.x) / 2),
+    y: p1.y + ((p2.y - p1.y) / 2)
+  }
+}
+
+
+
 /**
  * 计算根据圆心旋转后的点的坐标
  * @param   {Object}  point   旋转前的点坐标
@@ -73,6 +83,12 @@ export function getPoint(widgetStyle: WidgetStyle, center: MoveStartInfo, type: 
   console.log('type', type);
   let point: MoveStartInfo;
   switch (type) {
+    case 'n':
+      point = {
+        x: widgetStyle.left + (widgetStyle.width / 2),
+        y: widgetStyle.top
+      }
+      break;
     case 's':
       point = {
         x: widgetStyle.left + (widgetStyle.width / 2),
@@ -91,10 +107,28 @@ export function getPoint(widgetStyle: WidgetStyle, center: MoveStartInfo, type: 
           y: widgetStyle.top + widgetStyle.height / 2
         }
       break;
-    default: // n
+      case 'nw':
+        point = {
+          x: widgetStyle.left,
+          y: widgetStyle.top
+        }
+      break;
+      case 'ne':
+        point = {
+          x: widgetStyle.left + widgetStyle.width,
+          y: widgetStyle.top
+        }
+      break;
+      case 'sw':
+        point = {
+          x: widgetStyle.left,
+          y: widgetStyle.top + widgetStyle.height
+        }
+      break;
+    default: // se
       point = {
-        x: widgetStyle.left + (widgetStyle.width / 2),
-        y: widgetStyle.top
+        x: widgetStyle.left + widgetStyle.width,
+        y: widgetStyle.top+ widgetStyle.height
       }
       break;
   }

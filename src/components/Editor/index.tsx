@@ -33,7 +33,7 @@ export default defineComponent({
           const widget = cloneDeep(WidgetList[+index]);
           widget.widgetStyle.left = event.offsetX;
           widget.widgetStyle.top = event.offsetY;
-          widget.widgetStyle.rotate = 30;
+          // widget.widgetStyle.rotate = 0;
           widget.id = uniqueId('widget-');
           store.commit('editor/addWidget', widget);
           // console.log('target', widget);

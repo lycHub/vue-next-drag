@@ -1,6 +1,6 @@
 import {WidgetStyle} from "../../store/types";
 import {Direct, DotMouseDownInfo, MoveStartInfo} from "./types";
-import {getPoint, getRotatedPoint, sin} from "../../utils";
+import {getCenterPoint, getPoint, getRotatedPoint, sin} from "../../utils";
 
 export interface MoveDiff {
   diffX: number;
@@ -121,76 +121,94 @@ function stretchW(dotMousedownInfo: DotMouseDownInfo, widgetStyle: WidgetStyle, 
 }
 
 
-function stretchNW(widgetStyle: WidgetStyle, diff: MoveDiff, root: HTMLElement, callback: () => void) {
-  const { minSize, width, height, left, top } = widgetStyle;
+function stretchNW(dotMousedownInfo: DotMouseDownInfo, widgetStyle: WidgetStyle, currentPosition: MoveStartInfo, root: HTMLElement, callback: () => void) {
+  const { minSize } = widgetStyle;
+  const { sPoint } = dotMousedownInfo;
+  const newCenterPoint = getCenterPoint(currentPosition, sPoint);
+  const newTopLeftPoint = getRotatedPoint(currentPosition, newCenterPoint, -widgetStyle.rotate)
+  const newBottomRightPoint = getRotatedPoint(sPoint, newCenterPoint, -widgetStyle.rotate)
 
-  const newHeight = limitMinNum(height - diff.diffY, minSize.height);
-  const newWidth = limitMinNum(width - diff.diffX, minSize.width);
-  if (newHeight > minSize.height) {
-    root.style.height = newHeight + 'px';
-    root.style.top = (top + diff.diffY) + 'px';
-  }
-  if (newWidth > minSize.width) {
+  const newWidth = newBottomRightPoint.x - newTopLeftPoint.x
+  const newHeight = newBottomRightPoint.y - newTopLeftPoint.y
+  if (newWidth > minSize.width && newHeight > minSize.height) {
     root.style.width = newWidth + 'px';
-    root.style.left = (left + diff.diffX) + 'px';
+    root.style.height = newHeight + 'px';
+    root.style.left = newTopLeftPoint.x + 'px';
+    root.style.top = newTopLeftPoint.y + 'px';
+    callback();
   }
-  callback();
 }
 
-function stretchNE(widgetStyle: WidgetStyle, diff: MoveDiff, root: HTMLElement, callback: () => void) {
-  const { minSize, width, height, top } = widgetStyle;
+function stretchNE(dotMousedownInfo: DotMouseDownInfo, widgetStyle: WidgetStyle, currentPosition: MoveStartInfo, root: HTMLElement, callback: () => void) {
+  const { minSize } = widgetStyle;
+  const { sPoint } = dotMousedownInfo;
+  const newCenterPoint = getCenterPoint(currentPosition, sPoint);
 
-  const newHeight = limitMinNum(height - diff.diffY, minSize.height);
-  const newWidth = limitMinNum(width + diff.diffX, minSize.width);
-  if (newHeight > minSize.height) {
-    root.style.height = newHeight + 'px';
-    root.style.top = (top + diff.diffY) + 'px';
-  }
-  if (newWidth > minSize.width) {
+  const newTopRightPoint = getRotatedPoint(currentPosition, newCenterPoint, -widgetStyle.rotate)
+  const newBottomLeftPoint = getRotatedPoint(sPoint, newCenterPoint, -widgetStyle.rotate)
+
+  const newWidth = newTopRightPoint.x - newBottomLeftPoint.x
+  const newHeight = newBottomLeftPoint.y - newTopRightPoint.y
+  if (newWidth > minSize.width && newHeight > minSize.height) {
     root.style.width = newWidth + 'px';
-  }
-  callback();
-}
-
-
-function stretchSE(widgetStyle: WidgetStyle, diff: MoveDiff, root: HTMLElement, callback: () => void) {
-  const { minSize, width, height, top } = widgetStyle;
-
-  const newHeight = limitMinNum(height + diff.diffY, minSize.height);
-  const newWidth = limitMinNum(width + diff.diffX, minSize.width);
-  if (newHeight > minSize.height) {
     root.style.height = newHeight + 'px';
+    root.style.left = newBottomLeftPoint.x + 'px';
+    root.style.top = newTopRightPoint.y + 'px';
+    callback();
   }
-  if (newWidth > minSize.width) {
-    root.style.width = newWidth + 'px';
-  }
-  callback();
 }
 
 
+function stretchSE(dotMousedownInfo: DotMouseDownInfo, widgetStyle: WidgetStyle, currentPosition: MoveStartInfo, root: HTMLElement, callback: () => void) {
+  const { minSize } = widgetStyle;
+  const { sPoint } = dotMousedownInfo;
+  const newCenterPoint = getCenterPoint(currentPosition, sPoint);
 
-function stretchSW(widgetStyle: WidgetStyle, diff: MoveDiff, root: HTMLElement, callback: () => void) {
-  const { minSize, width, height, left } = widgetStyle;
+  const newTopLeftPoint = getRotatedPoint(sPoint, newCenterPoint, -widgetStyle.rotate)
+  const newBottomRightPoint = getRotatedPoint(currentPosition, newCenterPoint, -widgetStyle.rotate)
 
-  const newHeight = limitMinNum(height + diff.diffY, minSize.height);
-  const newWidth = limitMinNum(width - diff.diffX, minSize.width);
-  if (newHeight > minSize.height) {
-    root.style.height = newHeight + 'px';
-  }
-  if (newWidth > minSize.width) {
+  const newWidth = newBottomRightPoint.x - newTopLeftPoint.x
+  const newHeight = newBottomRightPoint.y - newTopLeftPoint.y
+
+  if (newWidth > minSize.width && newHeight > minSize.height) {
     root.style.width = newWidth + 'px';
-    root.style.left = (left + diff.diffX) + 'px';
+    root.style.height = newHeight + 'px';
+    root.style.left = newTopLeftPoint.x + 'px';
+    root.style.top = newTopLeftPoint.y + 'px';
+    callback();
   }
-  callback();
 }
-// @ts-ignore
+
+
+function stretchSW(dotMousedownInfo: DotMouseDownInfo, widgetStyle: WidgetStyle, currentPosition: MoveStartInfo, root: HTMLElement, callback: () => void) {
+  const { minSize } = widgetStyle;
+  const { sPoint } = dotMousedownInfo;
+  const newCenterPoint = getCenterPoint(currentPosition, sPoint);
+
+  const newTopRightPoint = getRotatedPoint(sPoint, newCenterPoint, -widgetStyle.rotate)
+  const newBottomLeftPoint = getRotatedPoint(currentPosition, newCenterPoint, -widgetStyle.rotate)
+
+  const newWidth = newTopRightPoint.x - newBottomLeftPoint.x
+  const newHeight = newBottomLeftPoint.y - newTopRightPoint.y
+  if (newWidth > minSize.width && newHeight > minSize.height) {
+    root.style.width = newWidth + 'px';
+    root.style.height = newHeight + 'px';
+    root.style.left = newBottomLeftPoint.x + 'px';
+    root.style.top = newTopRightPoint.y + 'px';
+    callback();
+  }
+}
+
+
+
+
 export const stretchStrategy: { [key: string]: (dotMousedownInfo: DotMouseDownInfo, widgetStyle: WidgetStyle, currentPosition: MoveStartInfo, root: HTMLElement, callback: () => void) => void } = {
   n: stretchN,
   e: stretchE,
   s: stretchS,
   w: stretchW,
-  // nw: stretchNW,
-  // ne: stretchNE,
-  // se: stretchSE,
-  // sw: stretchSW
+  nw: stretchNW,
+  ne: stretchNE,
+  se: stretchSE,
+  sw: stretchSW
 }
