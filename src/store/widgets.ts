@@ -27,8 +27,8 @@ export const elBtn: Widget = {
   },
   specialPanel: 'button-property',
   animateClass: {
-    animate: 'tada',
-    speed: 'fast'
+    // animate: 'tada',
+    // speed: 'fast'
   }
 }
 

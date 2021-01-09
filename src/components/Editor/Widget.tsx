@@ -180,22 +180,20 @@ export default defineComponent({
       root.value!.style.opacity = opacity.toString();
     });
     watch(() => props.info.animateClass, cls => {
-      console.log('wat animateClass', cls, root.value!.classList.toString());
       setCls(cls);
     });
 
     const setCls = (cls: Partial<WidgetAnimateClass>) => {
-      const animateClasses = root.value!.classList.toString().split(' ').filter(item => item.includes('animate__'));
-      // animate__animated
-      if (animateClasses.length > 1) {
-        for (let a = 1; a < animateClasses.length; a++) {
-          root.value!.classList.remove(animateClasses[a]);
-        }
-      }
+      // const animateClasses = root.value!.classList.toString().split(' ').filter(item => item.includes('animate__'));
+      // // animate__animated
+      // if (animateClasses.length > 1) {
+      //   for (let a = 1; a < animateClasses.length; a++) {
+      //     root.value!.classList.remove(animateClasses[a]);
+      //   }
+      // }
       [cls.animate, cls.speed].filter(Boolean).forEach(item => {
         root.value!.classList.add('animate__' + item!);
       });
-      console.log('animateClasses', animateClasses);
     }
 
     onMounted(() => {
@@ -207,6 +205,10 @@ export default defineComponent({
       root.value!.style.opacity = props.info.widgetStyle.opacity.toString();
       root.value!.style.zIndex = '1';
       setCls(props.info.animateClass);
+      root.value!.addEventListener('animationend', function() {
+        const active = isActive.value ? ' active' : '';
+        this.className = 'widget animate__animated' + active;
+      })
     });
 
     return () => {
