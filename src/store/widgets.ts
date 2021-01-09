@@ -1,6 +1,6 @@
 import {Widget} from "./types";
 
-export const elBtn = {
+export const elBtn: Widget = {
   component: 'el-button',
   name: '按钮',
   label: '按钮',
@@ -20,13 +20,16 @@ export const elBtn = {
   style: {
     borderRadius: '0px',
     width: '100%',
-    height: '100%',
-    opacity: 1
+    height: '100%'
   },
   props: {
     type: 'primary'
   },
-  specialPanel: 'button-property'
+  specialPanel: 'button-property',
+  animateClass: {
+    animate: 'tada',
+    speed: 'fast'
+  }
 }
 
 export const WidgetList: Widget[] = [elBtn];

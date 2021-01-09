@@ -3,9 +3,7 @@ import {properBase} from "../../../uses/propertyBase";
 
 export default defineComponent({
   name: 'Custom',
-  emits: ['changeBaseStyle', 'changeStyle'],
-  setup(props, { emit }) {
-    const store = properBase().store;
+  setup(props) {
     const activeWidget = properBase().widget;
     return () => {
       return (

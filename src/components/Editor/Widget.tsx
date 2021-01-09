@@ -1,5 +1,5 @@
-import {defineComponent, onMounted, ref, PropType, computed, h, watch} from "vue";
-import {Widget} from "../../store/types";
+import {defineComponent, onMounted, ref, PropType, computed, h, watch, reactive} from "vue";
+import {Widget, WidgetAnimateClass} from "../../store/types";
 import {useStore} from "../../store";
 import Dot from './Dot/index';
 import {Direct, DotInfo, DotMouseDownInfo, DragStartInfo, MoveStartInfo, WidgetMoveData} from "./types";
@@ -170,10 +170,33 @@ export default defineComponent({
       });
     }
 
+    const widgetCls = reactive({
+      widget: true,
+      animate__animated: true,
+      active: isActive.value
+    });
+
     watch(() => props.info.widgetStyle.opacity, opacity => {
       root.value!.style.opacity = opacity.toString();
     });
+    watch(() => props.info.animateClass, cls => {
+      console.log('wat animateClass', cls, root.value!.classList.toString());
+      setCls(cls);
+    });
 
+    const setCls = (cls: Partial<WidgetAnimateClass>) => {
+      const animateClasses = root.value!.classList.toString().split(' ').filter(item => item.includes('animate__'));
+      // animate__animated
+      if (animateClasses.length > 1) {
+        for (let a = 1; a < animateClasses.length; a++) {
+          root.value!.classList.remove(animateClasses[a]);
+        }
+      }
+      [cls.animate, cls.speed].filter(Boolean).forEach(item => {
+        root.value!.classList.add('animate__' + item!);
+      });
+      console.log('animateClasses', animateClasses);
+    }
 
     onMounted(() => {
       root.value!.style.left = props.info.widgetStyle.left + 'px';
@@ -183,13 +206,16 @@ export default defineComponent({
       root.value!.style.transform = `rotate(${props.info.widgetStyle.rotate}deg)`;
       root.value!.style.opacity = props.info.widgetStyle.opacity.toString();
       root.value!.style.zIndex = '1';
-      root.value!.setAttribute('in-canvas', 'true');
+      setCls(props.info.animateClass);
     });
-
 
     return () => {
       return (
-        <div class={ ['widget', { active: isActive.value }] } ref={ root } onClick={ stopClick } onMousedown={ handleMousedown }>
+        <div class={{
+          widget: true,
+          animate__animated: true,
+          active: isActive.value
+        }} ref={ root } onClick={ stopClick } onMousedown={ handleMousedown }>
           <RotateDot
             widgetStyle={ props.info.widgetStyle }
             v-show={ isActive.value }

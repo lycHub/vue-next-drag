@@ -5,6 +5,8 @@ export interface BaseStyle {
   borderColor: string;
   borderRadius: string;
   textAlign: string;
+  width?: string;
+  height?: string;
 }
 
 export interface WidgetStyle {
@@ -17,6 +19,11 @@ export interface WidgetStyle {
   opacity: number;
 }
 
+export interface WidgetAnimateClass {
+  animate: string;
+  speed: string;
+}
+
 export interface Widget {
   id?: string;
   component: string;
@@ -27,6 +34,7 @@ export interface Widget {
   widgetStyle: WidgetStyle;
   style: Partial<BaseStyle>;
   props: any;
+  animateClass: Partial<WidgetAnimateClass>;
 }
 
 

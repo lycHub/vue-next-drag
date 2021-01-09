@@ -1,5 +1,5 @@
 // @ts-ignore
-import {BaseStyle, Widget, WidgetStyle} from "../types";
+import {BaseStyle, Widget, WidgetAnimateClass, WidgetStyle} from "../types";
 import {Module} from "vuex";
 import {RootState} from "../types";
 // import {WidgetList} from "../widgets";
@@ -31,6 +31,12 @@ const editor: Module<EditorState, RootState> = {
       const target = state.widgets.find(item => item.id === newWidget.id);
       if (target) {
         target.label = newWidget.label;
+      }
+    },
+    setAnimateClass(state, newWidget: { id: string; cls: Partial<WidgetAnimateClass>}) {
+      const target = state.widgets.find(item => item.id === newWidget.id);
+      if (target) {
+        target.animateClass = { ...target.animateClass, ...newWidget.cls };
       }
     },
     setWidgetStyle(state, newWidget: { id: string; value: WidgetStyle }) {
