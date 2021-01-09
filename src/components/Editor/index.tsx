@@ -14,7 +14,7 @@ export default defineComponent({
     const renderWidgets = () => {
       return widgets.length ? widgets.map(item => {
         return <Widget info={ item } >
-          { h(resolveComponent(item.component), { ...item.attrs, style: item.style }, () => item.label) }
+          { h(resolveComponent(item.component), { ...item.props, style: item.style }, () => item.label) }
         </Widget>;
       }) : null;
     }
@@ -31,6 +31,7 @@ export default defineComponent({
         const index = event.dataTransfer?.getData('index'); // string | undefined
         if (index) {
           const widget = cloneDeep(WidgetList[+index]);
+          // console.log('drop', widget);
           widget.widgetStyle.left = event.offsetX;
           widget.widgetStyle.top = event.offsetY;
           // widget.widgetStyle.rotate = 0;
@@ -38,6 +39,9 @@ export default defineComponent({
           store.commit('editor/addWidget', widget);
           // console.log('target', widget);
         }
+      }
+      if (store.state.editor.activeWidgetId) {
+        store.commit('editor/setActivateWidgetId', '');
       }
     }
 

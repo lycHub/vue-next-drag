@@ -23,7 +23,7 @@ export const elBtn = {
     height: '100%',
     opacity: 1
   },
-  attrs: {
+  props: {
     type: 'primary'
   },
   specialPanel: 'button-property'

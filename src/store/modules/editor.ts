@@ -27,6 +27,12 @@ const editor: Module<EditorState, RootState> = {
     addWidget(state, widget: Widget) {
       state.widgets.push(widget);
     },
+    setLabel(state, newWidget: { id: string; label: string}) {
+      const target = state.widgets.find(item => item.id === newWidget.id);
+      if (target) {
+        target.label = newWidget.label;
+      }
+    },
     setWidgetStyle(state, newWidget: { id: string; value: WidgetStyle }) {
       const target = state.widgets.find(item => item.id === newWidget.id);
       if (target) {
@@ -39,8 +45,11 @@ const editor: Module<EditorState, RootState> = {
         target.style = { ...target.style, ...newWidget.value };
       }
     },
-    setWidgets(state, widgets: Widget[]) {
-      state.widgets = widgets;
+    setWidgetProps(state, newWidget: { id: string, props: any }) {
+      const target = state.widgets.find(item => item.id === newWidget.id);
+      if (target) {
+        target.props = { ...target.props, ...newWidget.props };
+      }
     }
   }
 }

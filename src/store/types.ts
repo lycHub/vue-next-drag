@@ -26,7 +26,7 @@ export interface Widget {
   icon: string;
   widgetStyle: WidgetStyle;
   style: Partial<BaseStyle>;
-  attrs: any;
+  props: any;
 }
 
 

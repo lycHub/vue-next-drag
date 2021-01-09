@@ -1,13 +1,13 @@
-import {defineComponent, reactive, watch, toRaw, ref, PropType} from "vue";
-import {BaseStyle, Widget} from "../../../store/types";
+import {defineComponent, reactive, watch, toRaw, ref} from "vue";
+import {BaseStyle} from "../../../store/types";
+import {properBase} from "../../../uses/propertyBase";
+import {createLogger} from "vuex";
 
 export default defineComponent({
   name: 'Base',
-  props: {
-    activeWidget: Object as PropType<Widget>
-  },
-  emits: ['changeBaseStyle', 'changeStyle'],
   setup(props, { emit }) {
+    const store = properBase().store;
+    const activeWidget = properBase().widget;
     const style = reactive<BaseStyle>({
       fontSize: '',
       color: '',
@@ -21,23 +21,30 @@ export default defineComponent({
       borderRadius: 0
     })
     const opacity = ref(1);
-    watch(() => props.activeWidget, widget => {
+    watch(activeWidget, widget => {
       // console.log('wat widget', widget?.style);
       if (widget) {
-        setValue(widget.style);
+        // setValue(widget.style);
+        setStyles(widget.style);
         opacity.value = widget.widgetStyle.opacity || 1;
       }
-    })
+    });
     watch([specialValue, style], ([special, style]) => {
-      emit('changeBaseStyle', {
-        ...toRaw(style),
-        fontSize: special.fontSize + 'px',
-        borderRadius: special.borderRadius + 'px',
-      })
+      store.commit('editor/setWidgetBaseStyle', {
+        id: activeWidget.value!.id,
+        value: {
+          ...toRaw(style),
+          fontSize: special.fontSize + 'px',
+          borderRadius: special.borderRadius + 'px',
+        }
+      });
     });
 
     watch(opacity, value => {
-      emit('changeStyle', { opacity: value });
+      store.commit('editor/setWidgetStyle', {
+        id: activeWidget.value!.id,
+        value: { opacity: value }
+      });
     });
 
     const setValue = (initStyle: Partial<BaseStyle>) => {
@@ -45,6 +52,7 @@ export default defineComponent({
         const attr = key as keyof BaseStyle;
         if (Reflect.has(specialValue, attr)) {
           if (initStyle[attr]) {
+            console.log('specialValue', specialValue, initStyle);
             // @ts-ignore
             specialValue[attr] = +initStyle[attr].slice(0, -2);
           }
@@ -55,12 +63,27 @@ export default defineComponent({
       })
     }
 
+    const setStyles = (newStyle: Partial<BaseStyle>) => {
+      // console.log('setProps', props);
+      Object.keys(style).forEach(key => {
+        const attr = key as keyof BaseStyle;
+        if (!Reflect.has(specialValue, attr)) {
+          if (newStyle[attr]) {
+            style[attr] = newStyle[attr]!;
+          }
+        } else {
+          specialValue.fontSize = newStyle.fontSize ? +newStyle.fontSize.slice(0, -2) : 14;
+          specialValue.borderRadius = newStyle.borderRadius ? +newStyle.borderRadius.slice(0, -2) : 14;
+        }
+      })
+    }
+
 
     return () => {
       return (
         <div>
           {
-            props.activeWidget ?
+            activeWidget.value ?
               <el-form ref="form" label-width="100px">
                 <el-form-item label="字号：">
                   <el-input-number min={ 12 } v-model={ specialValue.fontSize } size="small" />

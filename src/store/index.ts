@@ -3,7 +3,7 @@ import editor, {EditorState} from "./modules/editor";
 import {RootState} from "./types";
 import { InjectionKey } from 'vue';
 
-interface AllStoreType {
+export interface AllStoreType {
   editor: EditorState;
 }
 
