@@ -5,7 +5,6 @@ export interface BaseStyle {
   borderColor: string;
   borderRadius: string;
   textAlign: string;
-  opacity: number;
 }
 
 export interface WidgetStyle {
@@ -15,6 +14,7 @@ export interface WidgetStyle {
   width: number;
   height: number;
   minSize: { width: number; height: number };
+  opacity: number;
 }
 
 export interface Widget {

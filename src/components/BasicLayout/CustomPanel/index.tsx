@@ -2,7 +2,7 @@ import {defineComponent, ref, computed} from "vue";
 import Base from "./Base";
 import {useStore} from "../../../store";
 import { stopClick } from "../../../uses/stopClick";
-import {BaseStyle} from "../../../store/types";
+import {BaseStyle, WidgetStyle} from "../../../store/types";
 
 export default defineComponent({
   name: 'CustomPanel',
@@ -18,6 +18,14 @@ export default defineComponent({
       });
     }
 
+    const styleChange = (style: Partial<WidgetStyle>) => {
+      // console.log('baseChange', style);
+      store.commit('editor/setWidgetStyle', {
+        id: activeWidget.value!.id,
+        value: style
+      });
+    }
+
 
     return () => {
       return (
@@ -25,7 +33,7 @@ export default defineComponent({
           <el-tabs v-model={ active.value }>
             <el-tab-pane label="基本" name="base">
               {/*// @ts-ignore*/}
-              <Base activeWidget={ activeWidget.value } onChange={ baseChange } />
+              <Base activeWidget={ activeWidget.value } onChangeBaseStyle={ baseChange } onChangeStyle={ styleChange } />
             </el-tab-pane>
             <el-tab-pane label="定制" name="custom">配置管理</el-tab-pane>
           </el-tabs>

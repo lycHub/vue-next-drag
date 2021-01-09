@@ -1,4 +1,4 @@
-import {defineComponent, onMounted, ref, PropType, computed, h} from "vue";
+import {defineComponent, onMounted, ref, PropType, computed, h, watch} from "vue";
 import {Widget} from "../../store/types";
 import {useStore} from "../../store";
 import Dot from './Dot/index';
@@ -170,6 +170,10 @@ export default defineComponent({
       });
     }
 
+    watch(() => props.info.widgetStyle.opacity, opacity => {
+      root.value!.style.opacity = opacity.toString();
+    });
+
 
     onMounted(() => {
       root.value!.style.left = props.info.widgetStyle.left + 'px';
@@ -177,9 +181,11 @@ export default defineComponent({
       root.value!.style.width = props.info.widgetStyle.width + 'px';
       root.value!.style.height = props.info.widgetStyle.height + 'px';
       root.value!.style.transform = `rotate(${props.info.widgetStyle.rotate}deg)`;
+      root.value!.style.opacity = props.info.widgetStyle.opacity.toString();
       root.value!.style.zIndex = '1';
-      // root.value!.setAttribute('in-canvas', 'true');
+      root.value!.setAttribute('in-canvas', 'true');
     });
+
 
     return () => {
       return (

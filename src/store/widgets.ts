@@ -14,7 +14,8 @@ export const elBtn = {
     top: 0,
     width: 70,
     height: 40,
-    rotate: 0
+    rotate: 0,
+    opacity: 1
   },
   style: {
     borderRadius: '0px',

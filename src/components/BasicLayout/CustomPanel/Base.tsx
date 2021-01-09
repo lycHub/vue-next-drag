@@ -6,7 +6,7 @@ export default defineComponent({
   props: {
     activeWidget: Object as PropType<Widget>
   },
-  emits: ['change'],
+  emits: ['changeBaseStyle', 'changeStyle'],
   setup(props, { emit }) {
     const style = reactive<BaseStyle>({
       fontSize: '',
@@ -14,27 +14,30 @@ export default defineComponent({
       backgroundColor: '',
       borderColor: '',
       borderRadius: '',
-      textAlign: '',
-      opacity: 1
+      textAlign: ''
     });
     const specialValue = reactive({
       fontSize: 14,
       borderRadius: 0
     })
-    // const fontSize = ref(14);
-    // const borderRadius = ref(0);
+    const opacity = ref(1);
     watch(() => props.activeWidget, widget => {
       // console.log('wat widget', widget?.style);
-      if (widget?.style) {
+      if (widget) {
         setValue(widget.style);
+        opacity.value = widget.widgetStyle.opacity || 1;
       }
     })
     watch([specialValue, style], ([special, style]) => {
-      emit('change', {
+      emit('changeBaseStyle', {
         ...toRaw(style),
         fontSize: special.fontSize + 'px',
         borderRadius: special.borderRadius + 'px',
       })
+    });
+
+    watch(opacity, value => {
+      emit('changeStyle', { opacity: value });
     });
 
     const setValue = (initStyle: Partial<BaseStyle>) => {
@@ -82,7 +85,7 @@ export default defineComponent({
                   <el-color-picker v-model={ style.borderColor } />
                 </el-form-item>
                 <el-form-item label="透明度：">
-                  <el-input-number min={0} max={1} step={0.1} step-strictly v-model={ style.opacity } size="small" />
+                  <el-input-number min={0} max={1} step={0.1} step-strictly v-model={ opacity.value } size="small" />
                 </el-form-item>
               </el-form> :
             <span>请选择组件</span>
