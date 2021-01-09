@@ -4,9 +4,10 @@ import {useStore} from "../../store";
 import Dot from './Dot/index';
 import {Direct, DotInfo, DotMouseDownInfo, DragStartInfo, MoveStartInfo, WidgetMoveData} from "./types";
 import {emitter} from "./bus";
-import {MoveDiff, stretchStrategy} from "./stretch";
+import {stretchStrategy} from "./stretch";
 import {calculateDotInfo} from "./Dot/dot";
 import {getPoint} from "../../utils";
+import RotateDot from './RotateDot';
 
 export default defineComponent({
   name: 'Widget',
@@ -21,6 +22,7 @@ export default defineComponent({
     let startInfo: DragStartInfo | null = null;
     const dots = ref<DotInfo[]>([]);
     const store = useStore();
+    let moving = false;
     // const activeWidgetIds = store.state.editor.activeWidgetIds;
     const isActive = computed(() => store.state.editor.activeWidgetIds.findIndex(item => item === props.info.id) > -1);
     const setActive = () => {
@@ -39,6 +41,7 @@ export default defineComponent({
     }
 
     const handleMousedown = (event: MouseEvent) => {
+      // console.log('event', event.target);
       event.preventDefault();
       startInfo = {
         x: event.clientX,
@@ -54,6 +57,7 @@ export default defineComponent({
 
     const handleMouseMove = (event: MouseEvent) => {
       event.preventDefault();
+      moving = true;
       const diffX = event.clientX - startInfo!.x;
       const diffY = event.clientY - startInfo!.y;
       const { left, top } = calculate(diffX, diffY);
@@ -66,21 +70,25 @@ export default defineComponent({
     }
     const handleMouseUp = () => {
       toggleMoving(false);
-      root.value!.style.zIndex = '1';
-      const { widgetStyle, ...rest } = props.info;
-      store.commit('editor/updateWidget', {
-        id: props.info.id,
-        widget: {
-          ...rest,
-          widgetStyle: {
-            ...widgetStyle,
-            left: root.value!.offsetLeft,
-            top: root.value!.offsetTop
+      if (moving) {
+        root.value!.style.zIndex = '1';
+        const { widgetStyle, ...rest } = props.info;
+        store.commit('editor/updateWidget', {
+          id: props.info.id,
+          widget: {
+            ...rest,
+            widgetStyle: {
+              ...widgetStyle,
+              left: root.value!.offsetLeft,
+              top: root.value!.offsetTop
+            }
           }
-        }
-      });
-      // root.value!.style.transform = 'rotate(60deg)';
-      emitter.emit<void>('up');
+        });
+        // root.value!.style.transform = 'rotate(60deg)';
+        moving = false;
+        emitter.emit<void>('up');
+      }
+
     }
 
     const calculate = (diffX: number, diffY: number): { left: number; top: number } => {
@@ -161,6 +169,27 @@ export default defineComponent({
       event.stopPropagation();
     }
 
+    const handleRotateDotMove = (rotate: number) => {
+      // console.log('handleRotateDotMove', rotate);
+      root.value!.style.transform = 'rotate(' + rotate + 'deg)';
+      root.value!.setAttribute('data-rotate', rotate.toString());
+    }
+
+    const handleRotateDotUp = () => {
+      // console.log('handleRotateDotUp', root.value!.dataset.rotate);
+      const { widgetStyle, ...rest } = props.info;
+      store.commit('editor/updateWidget', {
+        id: props.info.id,
+        widget: {
+          ...rest,
+          widgetStyle: {
+            ...widgetStyle,
+            rotate: +(root.value!.dataset.rotate || 0)
+          }
+        }
+      });
+    }
+
 
     onMounted(() => {
       root.value!.style.left = props.info.widgetStyle.left + 'px';
@@ -175,7 +204,13 @@ export default defineComponent({
     return () => {
       return (
         <div class={ ['widget', { active: isActive.value }] } ref={ root } onClick={ handleClick } onMousedown={ handleMousedown }>
-          <i v-show={ isActive.value } class="el-icon-refresh-right rotate"></i>
+          <RotateDot
+            widgetStyle={ props.info.widgetStyle }
+            v-show={ isActive.value }
+            // @ts-ignore
+            onMove={ handleRotateDotMove }
+            onUp={ handleRotateDotUp }
+          />
           { isActive.value ? renderDots() : null }
           { slots.default!() }
         </div>

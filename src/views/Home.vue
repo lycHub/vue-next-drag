@@ -21,7 +21,9 @@ export default defineComponent({
     onMounted(() => {
       if (root.value) {
         root.value.addEventListener('click', (event: MouseEvent) => {
-          store.commit('editor/setActivateWidgetIds', []);
+          if (store.state.editor.activeWidgetIds.length) {
+            store.commit('editor/setActivateWidgetIds', []);
+          }
         });
       }
     });

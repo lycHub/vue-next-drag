@@ -24,9 +24,6 @@ export default defineComponent({
 
     const handleMouseMove = (event: MouseEvent) => {
       event.preventDefault();
-      // const diffX = event.clientX - startInfo.x;
-      // const diffY = event.clientY - startInfo.y;
-      // emit('move', { diffX, diffY });
       const { left, top } = store.state.editor.canvasRect!;
       emit('move', { x: event.clientX - left, y: event.clientY - top });
     }

@@ -17,13 +17,14 @@ export default defineComponent({
     },
     canvasRect: {
       type: Object as PropType<DOMRect | null>,
-      required: true
+      default: null
     }
   },
   setup(props) {
     let canvasOffset: WidgetOffset;
     onMounted(() => {
       nextTick(() => {
+        // console.log('canvasRect', props.canvasRect);
         if (props.canvasRect) {
           canvasOffset = getCanvasOffset(props.canvasRect);
         }
