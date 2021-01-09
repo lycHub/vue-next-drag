@@ -20,6 +20,7 @@ export interface WidgetStyle {
 export interface Widget {
   id?: string;
   component: string;
+  specialPanel: string;
   name: string;
   label: string;
   icon: string;

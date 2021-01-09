@@ -25,7 +25,8 @@ export const elBtn = {
   },
   attrs: {
     type: 'primary'
-  }
+  },
+  specialPanel: 'button-property'
 }
 
 export const WidgetList: Widget[] = [elBtn];
