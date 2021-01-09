@@ -1,3 +1,13 @@
+export interface BaseStyle {
+  fontSize: string;
+  color: string;
+  backgroundColor: string;
+  borderColor: string;
+  borderRadius: string;
+  textAlign: string;
+  opacity: number;
+}
+
 export interface WidgetStyle {
   left: number;
   top: number;
@@ -14,7 +24,7 @@ export interface Widget {
   label: string;
   icon: string;
   widgetStyle: WidgetStyle;
-  style: Record<string, number | string>; // object: key: string; val: number | string
+  style: Partial<BaseStyle>;
   attrs: any;
 }
 

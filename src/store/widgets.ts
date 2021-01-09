@@ -17,9 +17,10 @@ export const elBtn = {
     rotate: 0
   },
   style: {
-    borderRadius: 0,
+    borderRadius: '0px',
     width: '100%',
-    height: '100%'
+    height: '100%',
+    opacity: 1
   },
   attrs: {
     type: 'primary'

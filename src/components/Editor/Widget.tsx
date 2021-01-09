@@ -8,6 +8,7 @@ import {stretchStrategy} from "./stretch";
 import {calculateDotInfo} from "./Dot/dot";
 import {getPoint} from "../../utils";
 import RotateDot from './RotateDot';
+import {stopClick} from "../../uses/stopClick";
 
 export default defineComponent({
   name: 'Widget',
@@ -23,10 +24,9 @@ export default defineComponent({
     const dots = ref<DotInfo[]>([]);
     const store = useStore();
     let moving = false;
-    // const activeWidgetIds = store.state.editor.activeWidgetIds;
-    const isActive = computed(() => store.state.editor.activeWidgetIds.findIndex(item => item === props.info.id) > -1);
+    const isActive = computed(() => store.state.editor.activeWidgetId === props.info.id);
     const setActive = () => {
-      store.commit('editor/setActivateWidgetIds', [props.info.id]);
+      store.commit('editor/setActivateWidgetId', props.info.id);
       generateDots();
     }
 
@@ -72,19 +72,13 @@ export default defineComponent({
       toggleMoving(false);
       if (moving) {
         root.value!.style.zIndex = '1';
-        const { widgetStyle, ...rest } = props.info;
-        store.commit('editor/updateWidget', {
+        store.commit('editor/setWidgetStyle', {
           id: props.info.id,
-          widget: {
-            ...rest,
-            widgetStyle: {
-              ...widgetStyle,
-              left: root.value!.offsetLeft,
-              top: root.value!.offsetTop
-            }
+          value: {
+            left: root.value!.offsetLeft,
+            top: root.value!.offsetTop
           }
         });
-        // root.value!.style.transform = 'rotate(60deg)';
         moving = false;
         emitter.emit<void>('up');
       }
@@ -127,18 +121,13 @@ export default defineComponent({
     }
 
     const handleDotUp = () => {
-      const { widgetStyle, ...rest } = props.info;
-      store.commit('editor/updateWidget', {
+      store.commit('editor/setWidgetStyle', {
         id: props.info.id,
-        widget: {
-          ...rest,
-          widgetStyle: {
-            ...widgetStyle,
-            width: root.value!.clientWidth,
-            height: root.value!.clientHeight,
-            top: root.value!.offsetTop,
-            left: root.value!.offsetLeft
-          }
+        value: {
+          width: root.value!.clientWidth,
+          height: root.value!.clientHeight,
+          top: root.value!.offsetTop,
+          left: root.value!.offsetLeft
         }
       });
     }
@@ -164,11 +153,6 @@ export default defineComponent({
       });
     }
 
-    const handleClick = (event: MouseEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-
     const handleRotateDotMove = (rotate: number) => {
       // console.log('handleRotateDotMove', rotate);
       root.value!.style.transform = 'rotate(' + rotate + 'deg)';
@@ -178,14 +162,10 @@ export default defineComponent({
     const handleRotateDotUp = () => {
       // console.log('handleRotateDotUp', root.value!.dataset.rotate);
       const { widgetStyle, ...rest } = props.info;
-      store.commit('editor/updateWidget', {
+      store.commit('editor/setWidgetStyle', {
         id: props.info.id,
-        widget: {
-          ...rest,
-          widgetStyle: {
-            ...widgetStyle,
-            rotate: +(root.value!.dataset.rotate || 0)
-          }
+        value: {
+          rotate: +(root.value!.dataset.rotate || 0)
         }
       });
     }
@@ -203,7 +183,7 @@ export default defineComponent({
 
     return () => {
       return (
-        <div class={ ['widget', { active: isActive.value }] } ref={ root } onClick={ handleClick } onMousedown={ handleMousedown }>
+        <div class={ ['widget', { active: isActive.value }] } ref={ root } onClick={ stopClick } onMousedown={ handleMousedown }>
           <RotateDot
             widgetStyle={ props.info.widgetStyle }
             v-show={ isActive.value }

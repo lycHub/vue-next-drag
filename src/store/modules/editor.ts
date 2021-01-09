@@ -1,12 +1,12 @@
 // @ts-ignore
-import {Widget} from "../types";
+import {BaseStyle, Widget, WidgetStyle} from "../types";
 import {Module} from "vuex";
 import {RootState} from "../types";
 // import {WidgetList} from "../widgets";
 
 export interface EditorState {
   widgets: Widget[];
-  activeWidgetIds: string[];
+  activeWidgetId: string;
   canvasRect: DOMRect | null;
 }
 
@@ -14,24 +14,29 @@ const editor: Module<EditorState, RootState> = {
   namespaced: true,
   state: {
     widgets: [],
-    activeWidgetIds: [],
+    activeWidgetId: '',
     canvasRect: null
   },
   mutations: {
     setCanvasRect(state, canvasRect: DOMRect) {
       state.canvasRect = canvasRect;
     },
-    setActivateWidgetIds(state, ids: string[]) {
-      state.activeWidgetIds = ids;
+    setActivateWidgetId(state, id: string) {
+      state.activeWidgetId = id;
     },
     addWidget(state, widget: Widget) {
       state.widgets.push(widget);
     },
-    updateWidget(state, newWidget: { id: string; widget: Widget }) {
-      let index = state.widgets.findIndex(item => item.id === newWidget.id); // find不管用
-      if (index > -1) {
-        // state.widgets[index] = newWidget.widget;
-        state.widgets.splice(index, 1, newWidget.widget);
+    setWidgetStyle(state, newWidget: { id: string; value: WidgetStyle }) {
+      const target = state.widgets.find(item => item.id === newWidget.id);
+      if (target) {
+        target.widgetStyle = { ...target.widgetStyle, ...newWidget.value };
+      }
+    },
+    setWidgetBaseStyle(state, newWidget: { id: string, value: BaseStyle }) {
+      const target = state.widgets.find(item => item.id === newWidget.id);
+      if (target) {
+        target.style = { ...target.style, ...newWidget.value };
       }
     },
     setWidgets(state, widgets: Widget[]) {

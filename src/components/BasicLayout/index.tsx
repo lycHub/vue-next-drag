@@ -1,6 +1,7 @@
 import {defineComponent} from "vue";
 import Aside from "./Aside";
 import './index.scss';
+import CustomPanel from './CustomPanel';
 
 export default defineComponent({
   name: 'BasicLayout',
@@ -14,6 +15,9 @@ export default defineComponent({
               <Aside />
             </el-aside>
             <el-main class="main">{ slots.default!() }</el-main>
+            <el-aside class="aside" width="300px">
+              <CustomPanel />
+            </el-aside>
           </el-container>
         </el-container>
       );
