@@ -206,7 +206,7 @@ export default defineComponent({
 
     onMounted(() => {
       refresh();
-      // setCls(props.info.animateClass);
+      setCls(props.info.animateClass);
       root.value!.addEventListener('animationend', function() {
         const active = isActive.value ? ' active' : '';
         this.className = 'widget animate__animated' + active;

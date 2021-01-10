@@ -18,6 +18,12 @@ export default defineComponent({
   setup() {
     const root = ref<HTMLElement | null>(null);
     const store = useStore();
+    // store.dispatch('addSnapshot', newSnapshot);
+    const records = localStorage.getItem('record');
+    if (records) {
+      // console.log('records', records);
+      store.dispatch('addSnapshot', JSON.parse(records));
+    }
     onMounted(() => {
       if (root.value) {
         root.value.addEventListener('click', (event: MouseEvent) => {

@@ -29,3 +29,8 @@ export function delSnapshot(id: string, store: Store<AllStoreType>) {
 export function clearSnapshot(store: Store<AllStoreType>) {
   store.dispatch('addSnapshot', []);
 }
+
+
+export function saveSnapshot(store: Store<AllStoreType>) {
+  localStorage.setItem('record', JSON.stringify(store.getters.currentSnapshot as Widget[]));
+}

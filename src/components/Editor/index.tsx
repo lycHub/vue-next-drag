@@ -57,6 +57,9 @@ export default defineComponent({
 
     const canvas = ref<HTMLElement>();
     onMounted(() => {
+      if (currentSnapshot.value.length) {
+        store.commit('editor/resetWidgets', currentSnapshot.value);
+      }
       store.commit('editor/setCanvasRect', useRect(canvas.value!));
       // console.log('canvas', canvas.value!.getBoundingClientRect());
     })
