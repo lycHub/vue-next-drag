@@ -36,8 +36,3 @@ export interface Widget {
   props: any;
   animateClass: Partial<WidgetAnimateClass>;
 }
-
-
-export interface RootState {
-
-}

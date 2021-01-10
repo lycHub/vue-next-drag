@@ -5,6 +5,7 @@ import './index.scss';
 import {useStore} from '../../store';
 import {WidgetList} from "../../store/widgets";
 import { uniqueId, cloneDeep } from 'lodash';
+import {useRect} from "../../uses/rect";
 
 export default defineComponent({
   name: 'Editor',
@@ -47,7 +48,7 @@ export default defineComponent({
 
     const canvas = ref<HTMLElement>();
     onMounted(() => {
-      store.commit('editor/setCanvasRect', canvas.value!.getBoundingClientRect());
+      store.commit('editor/setCanvasRect', useRect(canvas.value!));
       // console.log('canvas', canvas.value!.getBoundingClientRect());
     })
 

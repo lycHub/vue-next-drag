@@ -1,8 +1,7 @@
 // @ts-ignore
 import {BaseStyle, Widget, WidgetAnimateClass, WidgetStyle} from "../types";
 import {Module} from "vuex";
-import {RootState} from "../types";
-// import {WidgetList} from "../widgets";
+import {RootState} from "../index";
 
 export interface EditorState {
   widgets: Widget[];
