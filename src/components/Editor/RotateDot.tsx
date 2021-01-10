@@ -22,7 +22,6 @@ export default defineComponent({
         x: props.widgetStyle.left + (props.widgetStyle.width / 2),
         y: props.widgetStyle.top + (props.widgetStyle.height / 2)
       }
-      // console.log('originCenter', originCenter);
       // emit('down' );
       toggleMoving(true);
     }

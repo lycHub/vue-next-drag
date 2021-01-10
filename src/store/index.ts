@@ -28,7 +28,6 @@ export const store = createStore<RootState>({
   },
   mutations: {
     setSnapshot(state, shot: { index: number; widgets: Widget[]; }) {
-      // console.log('shot widgets', shot.widgets, shot.index);
       if (shot.index !== state.currentIndex) {
         state.snapshots.length = state.currentIndex + 1;
       }
