@@ -3,7 +3,7 @@ import {Widget, WidgetAnimateClass} from "../../store/types";
 import {useStore} from "../../store";
 import Dot from './Dot/index';
 import {Direct, DotInfo, DotMouseDownInfo, DragStartInfo, MoveStartInfo, WidgetMoveData} from "./types";
-import {emitter} from "./bus";
+import {aniEmitter, emitter} from "./bus";
 import {stretchStrategy} from "./stretch";
 import {calculateDotInfo} from "./Dot/dot";
 import {getPoint} from "../../utils";
@@ -11,6 +11,7 @@ import RotateDot from './RotateDot';
 import {stopClick} from "../../uses/stopClick";
 import {properBase} from "../../uses/propertyBase";
 import { cloneDeep } from 'lodash';
+import {setSnapshot} from "../../uses/snapshop";
 
 export default defineComponent({
   name: 'WidgetBox',
@@ -81,7 +82,7 @@ export default defineComponent({
           ...cloneWidget,
           widgetStyle: { ...cloneWidget.widgetStyle,  left: root.value!.offsetLeft, top: root.value!.offsetTop }
         }
-        setSnapshot(newWidget);
+        setSnapshot(newWidget, store);
         moving = false;
         emitter.emit<void>('up');
       }
@@ -134,7 +135,7 @@ export default defineComponent({
           left: root.value!.offsetLeft
         }
       }
-      setSnapshot(newWidget);
+      setSnapshot(newWidget, store);
     }
 
 
@@ -170,26 +171,15 @@ export default defineComponent({
         ...cloneWidget,
         widgetStyle: { ...cloneWidget.widgetStyle, rotate: +(root.value!.dataset.rotate || 0) }
       }
-      setSnapshot(newWidget);
+      setSnapshot(newWidget, store);
     }
 
+    // watch(() => props.info.animateClass, cls => {
+    //   setCls(cls);
+    // });
 
-    const setSnapshot = (newWidget: Widget) => {
-      const newSnapshot = cloneDeep(currentSnapshot.value);
-      const activeInSnapshotIndex = newSnapshot.findIndex(item => item.id === newWidget.id);
-      // console.log('newSnapshot', newSnapshot, activeInSnapshotIndex);
-      if (activeInSnapshotIndex > -1) {
-        newSnapshot.splice(activeInSnapshotIndex, 1, cloneDeep(newWidget));
-      }
-      // console.log('newSnapshot', newSnapshot);
-      store.dispatch('addSnapshot', newSnapshot);
-    }
-
-    watch(() => props.info.widgetStyle.opacity, opacity => {
-      root.value!.style.opacity = opacity.toString();
-    });
-    watch(() => props.info.animateClass, cls => {
-      setCls(cls);
+    aniEmitter.on<void>('animate', () => {
+      setCls(props.info.animateClass);
     });
 
     const setCls = (cls: Partial<WidgetAnimateClass>) => {
@@ -206,16 +196,17 @@ export default defineComponent({
       root.value!.style.transform = `rotate(${props.info.widgetStyle.rotate}deg)`;
       root.value!.style.opacity = props.info.widgetStyle.opacity.toString();
       root.value!.style.zIndex = '1';
-      setCls(props.info.animateClass);
+      // setCls(props.info.animateClass);
     }
 
     watch(() => props.info, info => {
-      console.log('wat info', info);
+      // console.log('wat info', info);
       refresh();
     });
 
     onMounted(() => {
       refresh();
+      // setCls(props.info.animateClass);
       root.value!.addEventListener('animationend', function() {
         const active = isActive.value ? ' active' : '';
         this.className = 'widget animate__animated' + active;

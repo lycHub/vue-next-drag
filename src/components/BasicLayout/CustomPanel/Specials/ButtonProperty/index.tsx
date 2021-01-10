@@ -2,6 +2,8 @@ import {defineComponent, reactive, ref, toRaw, watch} from "vue";
 import './index.scss';
 import {properBase} from "../../../../../uses/propertyBase";
 import {BaseStyle, Widget} from "../../../../../store/types";
+import {cloneDeep} from "lodash";
+import {setSnapshot} from "../../../../../uses/snapshop";
 
 interface ButtonProps {
   disable: boolean;
@@ -49,17 +51,21 @@ export default defineComponent({
     });
 
     watch(label, label => {
-      store.commit('editor/setLabel', {
-        id: activeWidget.value!.id,
+      const cloneWidget = cloneDeep(activeWidget.value!);
+      const newWidget: Widget = {
+        ...cloneWidget,
         label
-      });
+      }
+      setSnapshot(newWidget, store);
     });
 
     watch(propValues, props => {
-      store.commit('editor/setWidgetProps', {
-        id: activeWidget.value!.id,
-        props
-      });
+      const cloneWidget = cloneDeep(activeWidget.value!);
+      const newWidget: Widget = {
+        ...cloneWidget,
+        props: { ...cloneWidget.props, ...props }
+      }
+      setSnapshot(newWidget, store);
     });
 
     return () => {

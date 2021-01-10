@@ -1,13 +1,16 @@
 import {defineComponent, reactive, watch, toRaw, ref} from "vue";
-import {BaseStyle} from "../../../store/types";
+import {BaseStyle, Widget} from "../../../store/types";
 import {properBase} from "../../../uses/propertyBase";
 import {createLogger} from "vuex";
+import {cloneDeep} from "lodash";
+import {setSnapshot} from "../../../uses/snapshop";
 
 export default defineComponent({
   name: 'Base',
   setup(props, { emit }) {
     const store = properBase().store;
     const activeWidget = properBase().widget;
+    const currentSnapshot = properBase().currentSnapshot;
     const style = reactive<BaseStyle>({
       fontSize: '',
       color: '',
@@ -29,31 +32,34 @@ export default defineComponent({
       }
     });
     watch([specialValue, style], ([special, style]) => {
-      store.commit('editor/setWidgetBaseStyle', {
-        id: activeWidget.value!.id,
-        value: {
+      const cloneWidget = cloneDeep(activeWidget.value!);
+      const newWidget: Widget = {
+        ...cloneWidget,
+        style: {
+          ...cloneWidget.style,
           ...toRaw(style),
           fontSize: special.fontSize + 'px',
           borderRadius: special.borderRadius + 'px',
         }
-      });
+      }
+      setSnapshot(newWidget, store);
     });
 
     watch(opacity, value => {
-      store.commit('editor/setWidgetStyle', {
-        id: activeWidget.value!.id,
-        value: { opacity: value }
-      });
+      const cloneWidget = cloneDeep(activeWidget.value!);
+      const newWidget: Widget = {
+        ...cloneWidget,
+        widgetStyle: { ...cloneWidget.widgetStyle, opacity: value }
+      }
+      setSnapshot(newWidget, store);
     });
 
     const setStyles = (newStyle: Partial<BaseStyle>) => {
-      // console.log('setProps', props);
+      // console.log('setStyles', newStyle);
       Object.keys(style).forEach(key => {
         const attr = key as keyof BaseStyle;
         if (!Reflect.has(specialValue, attr)) {
-          if (newStyle[attr]) {
-            style[attr] = newStyle[attr]!;
-          }
+          style[attr] = newStyle[attr] || '';
         } else {
           specialValue.fontSize = newStyle.fontSize ? +newStyle.fontSize.slice(0, -2) : 14;
           specialValue.borderRadius = newStyle.borderRadius ? +newStyle.borderRadius.slice(0, -2) : 14;

@@ -1,0 +1,15 @@
+import {Widget} from "../store/types";
+import {cloneDeep} from "lodash";
+import {Store} from "vuex";
+import {AllStoreType} from "../store";
+
+export function setSnapshot(newWidget: Widget, store: Store<AllStoreType>) {
+  const newSnapshot = cloneDeep(store.getters.currentSnapshot as Widget[]);
+  const activeInSnapshotIndex = newSnapshot.findIndex(item => item.id === newWidget.id);
+  // console.log('newSnapshot', newSnapshot, activeInSnapshotIndex);
+  if (activeInSnapshotIndex > -1) {
+    newSnapshot.splice(activeInSnapshotIndex, 1, cloneDeep(newWidget));
+  }
+  // console.log('newSnapshot', newSnapshot);
+  store.dispatch('addSnapshot', newSnapshot);
+}

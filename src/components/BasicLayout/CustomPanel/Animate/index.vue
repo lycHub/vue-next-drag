@@ -28,6 +28,7 @@ import { Effects } from './effects';
 import 'animate.css';
 import './index.scss';
 import {WidgetAnimateClass} from "../../../../store/types";
+import {aniEmitter} from "../../../Editor/bus";
 
 export default defineComponent({
   name: 'Animate',
@@ -46,6 +47,7 @@ export default defineComponent({
         id: activeWidget.value!.id,
         cls
       });
+      aniEmitter.emit<void>('animate');
     }
 
     watch(selected, value => {
