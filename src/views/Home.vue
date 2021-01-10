@@ -11,6 +11,7 @@ import {defineComponent, onMounted, ref} from 'vue';
 import BasicLayout from "../components/BasicLayout";
 import Editor from '../components/Editor';
 import {useStore} from "../store";
+import {storageKey} from "../main";
 
 export default defineComponent({
   name: 'Home',
@@ -18,7 +19,7 @@ export default defineComponent({
   setup() {
     const root = ref<HTMLElement | null>(null);
     const store = useStore();
-    const records = localStorage.getItem('record');
+    const records = localStorage.getItem(storageKey);
     if (records) {
       store.dispatch('addSnapshot', JSON.parse(records));
     }

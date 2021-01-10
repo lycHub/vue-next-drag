@@ -2,6 +2,7 @@ import {Widget} from "../store/types";
 import {cloneDeep} from "lodash";
 import {Store} from "vuex";
 import {AllStoreType} from "../store";
+import {storageKey} from "../main";
 
 export function setSnapshot(newWidget: Widget, store: Store<AllStoreType>) {
   const newSnapshot = cloneDeep(store.getters.currentSnapshot as Widget[]);
@@ -32,5 +33,5 @@ export function clearSnapshot(store: Store<AllStoreType>) {
 
 
 export function saveSnapshot(store: Store<AllStoreType>) {
-  localStorage.setItem('record', JSON.stringify(store.getters.currentSnapshot as Widget[]));
+  localStorage.setItem(storageKey, JSON.stringify(store.getters.currentSnapshot as Widget[]));
 }

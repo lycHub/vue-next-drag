@@ -1,7 +1,7 @@
-import {defineComponent, h, ref, resolveComponent} from "vue";
-import {useStore} from "../../store";
+import {defineComponent} from "vue";
 import {properBase} from "../../uses/propertyBase";
 import {clearSnapshot, delSnapshot, saveSnapshot} from "../../uses/snapshop";
+import { ElMessage } from 'element-plus'
 
 export default defineComponent({
   name: 'Header',
@@ -23,6 +23,10 @@ export default defineComponent({
 
     const handleSave = () => {
       saveSnapshot(store);
+      ElMessage.success({
+        message: '已保存',
+        type: 'success'
+      });
     }
     return () => {
       return (
