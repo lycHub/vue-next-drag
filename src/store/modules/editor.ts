@@ -55,7 +55,13 @@ const editor: Module<EditorState, RootState> = {
       if (target) {
         target.props = { ...target.props, ...newWidget.props };
       }
+    },
+    resetWidgets(state, widgets: Widget[]) {
+      state.widgets = widgets;
     }
+  },
+  actions: {
+
   }
 }
 

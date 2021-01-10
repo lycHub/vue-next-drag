@@ -4,10 +4,12 @@
     padding: 14px 10px;
     background-color: #fff;
     border-bottom: 1px solid #dcdfe6;
-    .left {
+    .wrap {
       display: flex;
-      width: 300px;
-      justify-content: space-between;
+      align-items: center;
+      .actions {
+        margin-left: 18px;
+      }
     }
   }
   .aside {

@@ -9,9 +9,11 @@ import {calculateDotInfo} from "./Dot/dot";
 import {getPoint} from "../../utils";
 import RotateDot from './RotateDot';
 import {stopClick} from "../../uses/stopClick";
+import {properBase} from "../../uses/propertyBase";
+import { cloneDeep } from 'lodash';
 
 export default defineComponent({
-  name: 'Widget',
+  name: 'WidgetBox',
   props: {
     info: {
       type: Object as PropType<Widget>,
@@ -22,9 +24,11 @@ export default defineComponent({
     const root = ref<HTMLElement | null>(null);
     let startInfo: DragStartInfo | null = null;
     const dots = ref<DotInfo[]>([]);
-    const store = useStore();
+    const store = properBase().store;
+    const currentSnapshot = properBase().currentSnapshot;
+    const activeWidget = properBase().widget;
     let moving = false;
-    const isActive = computed(() => store.state.editor.activeWidgetId === props.info.id);
+    const isActive = computed(() => !!activeWidget);
     const setActive = () => {
       store.commit('editor/setActivateWidgetId', props.info.id);
       generateDots();
@@ -79,10 +83,22 @@ export default defineComponent({
             top: root.value!.offsetTop
           }
         });
+        // console.log('activeWidget', activeWidget.value);
+        setSnapshot();
         moving = false;
         emitter.emit<void>('up');
       }
+    }
 
+    const setSnapshot = () => {
+      const newSnapshot = cloneDeep(currentSnapshot.value);
+      const activeInSnapshotIndex = newSnapshot.findIndex(item => item.id === activeWidget.value!.id);
+      // console.log('newSnapshot', newSnapshot, activeInSnapshotIndex);
+      if (activeInSnapshotIndex > -1) {
+        newSnapshot.splice(activeInSnapshotIndex, 1, cloneDeep(activeWidget.value!));
+      }
+      // console.log('newSnapshot', newSnapshot);
+      store.dispatch('addSnapshot', newSnapshot);
     }
 
     const calculate = (diffX: number, diffY: number): { left: number; top: number } => {
@@ -170,12 +186,6 @@ export default defineComponent({
       });
     }
 
-    const widgetCls = reactive({
-      widget: true,
-      animate__animated: true,
-      active: isActive.value
-    });
-
     watch(() => props.info.widgetStyle.opacity, opacity => {
       root.value!.style.opacity = opacity.toString();
     });
@@ -184,19 +194,12 @@ export default defineComponent({
     });
 
     const setCls = (cls: Partial<WidgetAnimateClass>) => {
-      // const animateClasses = root.value!.classList.toString().split(' ').filter(item => item.includes('animate__'));
-      // // animate__animated
-      // if (animateClasses.length > 1) {
-      //   for (let a = 1; a < animateClasses.length; a++) {
-      //     root.value!.classList.remove(animateClasses[a]);
-      //   }
-      // }
       [cls.animate, cls.speed].filter(Boolean).forEach(item => {
         root.value!.classList.add('animate__' + item!);
       });
     }
 
-    onMounted(() => {
+    const refresh = () => {
       root.value!.style.left = props.info.widgetStyle.left + 'px';
       root.value!.style.top = props.info.widgetStyle.top + 'px';
       root.value!.style.width = props.info.widgetStyle.width + 'px';
@@ -205,10 +208,18 @@ export default defineComponent({
       root.value!.style.opacity = props.info.widgetStyle.opacity.toString();
       root.value!.style.zIndex = '1';
       setCls(props.info.animateClass);
+    }
+
+    watch(() => props.info, info => {
+      console.log('wat info', info);
+    });
+
+    onMounted(() => {
+      refresh();
       root.value!.addEventListener('animationend', function() {
         const active = isActive.value ? ' active' : '';
         this.className = 'widget animate__animated' + active;
-      })
+      });
     });
 
     return () => {

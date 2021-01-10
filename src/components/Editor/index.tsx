@@ -1,22 +1,31 @@
-import {defineComponent, h, resolveComponent, ref, onMounted} from "vue";
-import Widget from "./Widget";
+import {defineComponent, h, resolveComponent, ref, onMounted, watch, computed} from "vue";
 import Lines from "./Lines";
+import WidgetBox from './Widget';
 import './index.scss';
 import {useStore} from '../../store';
 import {WidgetList} from "../../store/widgets";
 import { uniqueId, cloneDeep } from 'lodash';
 import {useRect} from "../../uses/rect";
+import {Widget} from "../../store/types";
+import {properBase} from "../../uses/propertyBase";
 
 export default defineComponent({
   name: 'Editor',
   setup(props) {
-    const store = useStore();
-    const widgets = store.state.editor.widgets;
+    const store = properBase().store;
+    const currentSnapshot = properBase().currentSnapshot;
+    const widgets = computed(() => store.state.editor.widgets);
+
+    watch(currentSnapshot, value => {
+      store.commit('editor/resetWidgets', value);
+    });
+    
     const renderWidgets = () => {
-      return widgets.length ? widgets.map(item => {
-        return <Widget info={ item } >
+      // console.log('renderWidgets', currentSnapshot.value);
+      return widgets.value.length ? widgets.value.map(item => {
+        return <WidgetBox info={ item } >
           { h(resolveComponent(item.component), { ...item.props, style: item.style }, () => item.label) }
-        </Widget>;
+        </WidgetBox>;
       }) : null;
     }
 
@@ -37,8 +46,8 @@ export default defineComponent({
           widget.widgetStyle.top = event.offsetY;
           // widget.widgetStyle.rotate = 0;
           widget.id = uniqueId('widget-');
-          store.commit('editor/addWidget', widget);
-          // console.log('target', widget);
+          store.dispatch('addSnapshot', currentSnapshot.value.concat(widget));
+          // store.commit('editor/addWidget', cloneDeep(widget));
         }
       }
       if (store.state.editor.activeWidgetId) {
@@ -58,7 +67,7 @@ export default defineComponent({
           <div class="editor-box">
             <div ref={ canvas } class="canvas" onDragover={ handleDragOver } onDrop={ handleDrop }>
               { renderWidgets() }
-              <Lines canvasRect={ store.state.editor.canvasRect } widgets={ widgets } />
+              <Lines canvasRect={ store.state.editor.canvasRect } widgets={ widgets.value } />
             </div>
             <div class="drag-height">
               <span>拖动调节高度</span>

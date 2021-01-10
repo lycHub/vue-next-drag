@@ -2,6 +2,7 @@ import {defineComponent} from "vue";
 import Aside from "./Aside";
 import './index.scss';
 import CustomPanel from './CustomPanel';
+import Header from "./Header";
 
 export default defineComponent({
   name: 'BasicLayout',
@@ -10,11 +11,7 @@ export default defineComponent({
       return (
         <el-container class="basic-layout">
           <el-header class="header">
-            <div class="left">
-              <h2>vue3-ts-drag</h2>
-              <el-button size="small">后退</el-button>
-              <el-button size="small">前进</el-button>
-            </div>
+            <Header />
           </el-header>
           <el-container>
             <el-aside class="aside" width="200px">

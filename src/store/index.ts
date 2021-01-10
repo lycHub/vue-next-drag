@@ -22,16 +22,20 @@ export const store = createStore<RootState>({
     currentIndex: -1
   },
   getters: {
-    targetSnapshot(state) {
-      return state.snapshots[state.currentIndex];
+    currentSnapshot(state) {
+      return state.snapshots[state.currentIndex] || [];
     }
   },
   mutations: {
     setSnapshot(state, shot: { index: number; widgets: Widget[]; }) {
+      // console.log('shot widgets', shot.widgets, shot.index);
+      if (shot.index !== state.currentIndex) {
+        state.snapshots.length = state.currentIndex + 1;
+      }
       state.snapshots.splice(shot.index, 0, shot.widgets);
     },
     setCurrentIndex(state, index: number) {
-      state.currentIndex = index;
+      state.currentIndex = Math.max(index, -1);
     }
   },
   actions: {
@@ -43,8 +47,9 @@ export const store = createStore<RootState>({
       });
       commit('setCurrentIndex', newIndex);
     },
-    goBack({ state, commit }) {
-      commit('setCurrentIndex', state.currentIndex - 1);
+    changeIndex({ commit, getters }, index: number) {
+      commit('setCurrentIndex', index);
+      this.commit('editor/resetWidgets', getters.currentSnapshot as Widget[]);
     }
   },
   strict: isDev,
