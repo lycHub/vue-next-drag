@@ -80,7 +80,6 @@ export function getRotatedPoint(point: MoveStartInfo, center: MoveStartInfo, rot
  * @return {Object}          旋转后的手柄坐标
  */
 export function getPoint(widgetStyle: WidgetStyle, center: MoveStartInfo, type: string): MoveStartInfo {
-  console.log('type', type);
   let point: MoveStartInfo;
   switch (type) {
     case 'n':

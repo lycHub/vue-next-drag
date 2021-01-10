@@ -45,7 +45,6 @@ export default defineComponent({
       const otherWidgets = props.widgets.filter(item => item.id !== id);
       if (otherWidgets.length) {
         saveWidgetsOffset(otherWidgets);
-        // console.log('wat press', offsetInfo);
       }
     }
 

@@ -22,7 +22,6 @@ export default defineComponent({
     });
 
     const setProps = (props: CardProps) => {
-      // console.log('setProps', props);
       Object.keys(propValues).forEach(key => {
         const prop = key as keyof CardProps;
         if (props[prop]) {
