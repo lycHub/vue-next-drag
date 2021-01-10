@@ -179,7 +179,9 @@ export default defineComponent({
     // });
 
     aniEmitter.on<void>('animate', () => {
-      setCls(props.info.animateClass);
+      if (isActive.value) {
+        setCls(props.info.animateClass);
+      }
     });
 
     const setCls = (cls: Partial<WidgetAnimateClass>) => {

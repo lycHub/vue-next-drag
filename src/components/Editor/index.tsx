@@ -24,7 +24,11 @@ export default defineComponent({
       // console.log('renderWidgets', currentSnapshot.value);
       return widgets.value.length ? widgets.value.map(item => {
         return <WidgetBox info={ item } >
-          { h(resolveComponent(item.component), { ...item.props, style: item.style }, () => item.label) }
+          {
+            item.name === '按钮' ?
+              h(resolveComponent(item.component), { ...item.props, style: item.style }, () => item.label) :
+              h(resolveComponent(item.component), { ...item.props, style: item.style }, () => item.label)
+          }
         </WidgetBox>;
       }) : null;
     }
@@ -45,7 +49,7 @@ export default defineComponent({
           widget.widgetStyle.left = event.offsetX;
           widget.widgetStyle.top = event.offsetY;
           // widget.widgetStyle.rotate = 0;
-          widget.id = uniqueId('widget-');
+          widget.id = generateUUID();
           store.dispatch('addSnapshot', currentSnapshot.value.concat(widget));
           // store.commit('editor/addWidget', cloneDeep(widget));
         }
@@ -81,3 +85,14 @@ export default defineComponent({
     }
   }
 });
+
+
+function generateUUID(){
+  let d = new Date().getTime();
+  const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = (d + Math.random() * 16) % 16 | 0;
+    d = Math.floor(d/16);
+    return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+  });
+  return uuid;
+}
