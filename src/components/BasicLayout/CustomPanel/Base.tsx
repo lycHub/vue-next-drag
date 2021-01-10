@@ -24,7 +24,6 @@ export default defineComponent({
     watch(activeWidget, widget => {
       // console.log('wat widget', widget?.style);
       if (widget) {
-        // setValue(widget.style);
         setStyles(widget.style);
         opacity.value = widget.widgetStyle.opacity || 1;
       }
@@ -46,22 +45,6 @@ export default defineComponent({
         value: { opacity: value }
       });
     });
-
-    const setValue = (initStyle: Partial<BaseStyle>) => {
-      Object.keys(style).forEach((key) => {
-        const attr = key as keyof BaseStyle;
-        if (Reflect.has(specialValue, attr)) {
-          if (initStyle[attr]) {
-            console.log('specialValue', specialValue, initStyle);
-            // @ts-ignore
-            specialValue[attr] = +initStyle[attr].slice(0, -2);
-          }
-        } else {
-          // @ts-ignore
-          style[attr] = initStyle[attr] || '';
-        }
-      })
-    }
 
     const setStyles = (newStyle: Partial<BaseStyle>) => {
       // console.log('setProps', props);

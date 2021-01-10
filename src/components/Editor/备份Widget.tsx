@@ -28,7 +28,7 @@ export default defineComponent({
     const currentSnapshot = properBase().currentSnapshot;
     const activeWidget = properBase().widget;
     let moving = false;
-    const isActive = computed(() => activeWidget.value?.id === props.info.id);
+    const isActive = computed(() => !!activeWidget);
     const setActive = () => {
       store.commit('editor/setActivateWidgetId', props.info.id);
       generateDots();
@@ -76,12 +76,15 @@ export default defineComponent({
       toggleMoving(false);
       if (moving) {
         root.value!.style.zIndex = '1';
-        const cloneWidget = cloneDeep(props.info);
-        const newWidget: Widget = {
-          ...cloneWidget,
-          widgetStyle: { ...cloneWidget.widgetStyle,  left: root.value!.offsetLeft, top: root.value!.offsetTop }
-        }
-        setSnapshot(newWidget);
+        store.commit('editor/setWidgetStyle', {
+          id: props.info.id,
+          value: {
+            left: root.value!.offsetLeft,
+            top: root.value!.offsetTop
+          }
+        });
+        // console.log('activeWidget', activeWidget.value);
+        setSnapshot();
         moving = false;
         emitter.emit<void>('up');
       }
@@ -106,10 +109,10 @@ export default defineComponent({
         y: widgetStyle.top + (widgetStyle.height / 2)
       }
       const handlePoint = getPoint(widgetStyle, center, type);
-     /* const sPoint = {
-        x: center.x + Math.abs(handlePoint.x - center.x) * (handlePoint.x < center.x ? 1 : -1),
-        y: center.y + Math.abs(handlePoint.y - center.y) * (handlePoint.y < center.y ? 1 : -1)
-      }*/
+      /* const sPoint = {
+         x: center.x + Math.abs(handlePoint.x - center.x) * (handlePoint.x < center.x ? 1 : -1),
+         y: center.y + Math.abs(handlePoint.y - center.y) * (handlePoint.y < center.y ? 1 : -1)
+       }*/
       const sPoint = {
         x: center.x - (handlePoint.x - center.x),
         y: center.y - (handlePoint.y - center.y)
@@ -123,18 +126,15 @@ export default defineComponent({
     }
 
     const handleDotUp = () => {
-      const cloneWidget = cloneDeep(props.info);
-      const newWidget: Widget = {
-        ...cloneWidget,
-        widgetStyle: {
-          ...cloneWidget.widgetStyle,
+      store.commit('editor/setWidgetStyle', {
+        id: props.info.id,
+        value: {
           width: root.value!.clientWidth,
           height: root.value!.clientHeight,
           top: root.value!.offsetTop,
           left: root.value!.offsetLeft
         }
-      }
-      setSnapshot(newWidget);
+      });
     }
 
 
@@ -165,21 +165,23 @@ export default defineComponent({
     }
 
     const handleRotateDotUp = () => {
-      const cloneWidget = cloneDeep(props.info);
-      const newWidget: Widget = {
-        ...cloneWidget,
-        widgetStyle: { ...cloneWidget.widgetStyle, rotate: +(root.value!.dataset.rotate || 0) }
-      }
-      setSnapshot(newWidget);
+      // console.log('handleRotateDotUp', root.value!.dataset.rotate);
+      const { widgetStyle, ...rest } = props.info;
+      store.commit('editor/setWidgetStyle', {
+        id: props.info.id,
+        value: {
+          rotate: +(root.value!.dataset.rotate || 0)
+        }
+      });
     }
 
 
-    const setSnapshot = (newWidget: Widget) => {
+    const setSnapshot = () => {
       const newSnapshot = cloneDeep(currentSnapshot.value);
-      const activeInSnapshotIndex = newSnapshot.findIndex(item => item.id === newWidget.id);
+      const activeInSnapshotIndex = newSnapshot.findIndex(item => item.id === activeWidget.value!.id);
       // console.log('newSnapshot', newSnapshot, activeInSnapshotIndex);
       if (activeInSnapshotIndex > -1) {
-        newSnapshot.splice(activeInSnapshotIndex, 1, cloneDeep(newWidget));
+        newSnapshot.splice(activeInSnapshotIndex, 1, cloneDeep(activeWidget.value!));
       }
       // console.log('newSnapshot', newSnapshot);
       store.dispatch('addSnapshot', newSnapshot);
@@ -211,7 +213,6 @@ export default defineComponent({
 
     watch(() => props.info, info => {
       console.log('wat info', info);
-      refresh();
     });
 
     onMounted(() => {
