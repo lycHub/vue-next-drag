@@ -31,5 +31,6 @@
     "sass-loader": "^8.0.2",
     "typescript": "~3.9.3",
     "vue-cli-plugin-element-plus": "0.0.9"
-  }
+  },
+  "homepage": "https://lycHub.github.io/vue-next-drag-demo"
 }
