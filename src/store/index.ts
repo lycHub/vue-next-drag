@@ -46,10 +46,6 @@ export const store = createStore<RootState>({
         widgets
       });
       commit('setCurrentIndex', newIndex);
-    },
-    changeIndex({ commit, getters }, index: number) {
-      commit('setCurrentIndex', index);
-      this.commit('editor/resetWidgets', getters.currentSnapshot as Widget[]);
     }
   },
   strict: isDev,

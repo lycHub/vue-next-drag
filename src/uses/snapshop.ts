@@ -13,3 +13,19 @@ export function setSnapshot(newWidget: Widget, store: Store<AllStoreType>) {
   // console.log('newSnapshot', newSnapshot);
   store.dispatch('addSnapshot', newSnapshot);
 }
+
+
+export function delSnapshot(id: string, store: Store<AllStoreType>) {
+  const newSnapshot = cloneDeep(store.getters.currentSnapshot as Widget[]);
+  const activeInSnapshotIndex = newSnapshot.findIndex(item => item.id === id);
+  // console.log('newSnapshot', newSnapshot, activeInSnapshotIndex);
+  if (activeInSnapshotIndex > -1) {
+    newSnapshot.splice(activeInSnapshotIndex, 1);
+  }
+  // console.log('newSnapshot', newSnapshot);
+  store.dispatch('addSnapshot', newSnapshot);
+}
+
+export function clearSnapshot(store: Store<AllStoreType>) {
+  store.dispatch('addSnapshot', []);
+}
